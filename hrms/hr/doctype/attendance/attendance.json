@@ -13,6 +13,7 @@
   "employee_name",
   "working_hours",
   "status",
+  "working_from",
   "leave_type",
   "leave_application",
   "column_break0",
@@ -37,13 +38,14 @@
    "options": "Simple"
   },
   {
+   "default": "HR-ATT-.YYYY.-",
    "fieldname": "naming_series",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
+   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "oldfieldname": "naming_series",
    "oldfieldtype": "Select",
-   "options": "HR-ATT-.YYYY.-",
    "reqd": 1,
    "set_only_once": 1
   },
@@ -86,7 +88,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nWork From Home",
+   "options": "Present\nLeave\nHalf Day\nOn Leave\nWork From Home",
    "reqd": 1,
    "search_index": 1
   },
@@ -186,28 +188,36 @@
   },
   {
    "depends_on": "shift",
+   "fetch_from": "shift.start_time",
    "fieldname": "in_time",
-   "fieldtype": "Datetime",
-   "label": "In Time",
-   "read_only": 1
+   "fieldtype": "Time",
+   "label": "Check-in Time"
   },
   {
    "depends_on": "shift",
+   "fetch_from": "shift.end_time",
    "fieldname": "out_time",
-   "fieldtype": "Datetime",
-   "label": "Out Time",
-   "read_only": 1
+   "fieldtype": "Time",
+   "label": "Check-out Time"
   },
   {
    "fieldname": "column_break_18",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "Office",
+   "depends_on": "eval:doc.status == 'Present'",
+   "fieldname": "working_from",
+   "fieldtype": "Select",
+   "label": "Working From",
+   "options": "Office\nHome"
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-15 20:09:21.730465",
+ "modified": "2023-08-15 11:34:23.571376",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
@@ -254,6 +264,15 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1
   }
  ],
  "search_fields": "employee,employee_name,attendance_date,status",

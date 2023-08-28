@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "description"
+  "description",
+  "amended_from"
  ],
  "fields": [
   {
@@ -23,11 +24,21 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Description"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "KRA",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_calendar_and_gantt": 1,
  "links": [],
- "modified": "2023-03-17 20:53:40.000452",
+ "modified": "2023-08-07 02:50:05.692012",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "KRA",
@@ -52,5 +63,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "track_changes": 1
+ "track_changes": 1,
+ "track_seen": 1
 }

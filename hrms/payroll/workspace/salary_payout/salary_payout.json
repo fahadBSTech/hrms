@@ -2,12 +2,14 @@
  "charts": [],
  "content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Slip\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payroll Entry\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Salary Register\",\"col\":3}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Transactions &amp; Reports</b></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Payroll\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Incentives\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Loans\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Accounting\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Accounting Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Payroll Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Deduction Reports\",\"col\":4}}]",
  "creation": "2022-08-20 16:43:32.769568",
+ "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
  "icon": "income",
  "idx": 0,
+ "is_hidden": 0,
  "label": "Salary Payout",
  "links": [
   {
@@ -385,16 +387,17 @@
    "type": "Link"
   }
  ],
- "modified": "2022-09-21 12:27:38.631110",
+ "modified": "2023-08-11 12:48:50.951861",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Payout",
+ "number_cards": [],
  "owner": "Administrator",
  "parent_page": "Payroll",
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 10.0,
+ "sequence_id": 24.0,
  "shortcuts": [
   {
    "color": "Red",

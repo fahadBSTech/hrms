@@ -53,31 +53,31 @@ def get_columns() -> List[Dict]:
 		},
 		{
 			"label": _("Opening Balance"),
-			"fieldtype": "float",
+			"fieldtype": "Float",
 			"fieldname": "opening_balance",
 			"width": 150,
 		},
 		{
 			"label": _("New Leave(s) Allocated"),
-			"fieldtype": "float",
+			"fieldtype": "Float",
 			"fieldname": "leaves_allocated",
 			"width": 200,
 		},
 		{
 			"label": _("Leave(s) Taken"),
-			"fieldtype": "float",
+			"fieldtype": "Float",
 			"fieldname": "leaves_taken",
 			"width": 150,
 		},
 		{
 			"label": _("Leave(s) Expired"),
-			"fieldtype": "float",
+			"fieldtype": "Float",
 			"fieldname": "leaves_expired",
 			"width": 150,
 		},
 		{
 			"label": _("Closing Balance"),
-			"fieldtype": "float",
+			"fieldtype": "Float",
 			"fieldname": "closing_balance",
 			"width": 150,
 		},
@@ -98,26 +98,26 @@ def get_data(filters: Filters) -> List:
 	)
 
 	precision = cint(frappe.db.get_single_value("System Settings", "float_precision", cache=True))
-	consolidate_leave_types = len(active_employees) > 1 and filters.consolidate_leave_types
+	# consolidate_leave_types = len(active_employees) > 1 and filters.consolidate_leave_types
 	row = None
 
 	data = []
 
 	for leave_type in leave_types:
-		if consolidate_leave_types:
-			data.append({"leave_type": leave_type})
-		else:
-			row = frappe._dict({"leave_type": leave_type})
+		# if consolidate_leave_types:
+		# 	data.append({"leave_type": leave_type})
+		# else:
+		row = frappe._dict({"leave_type": leave_type})
 
 		for employee in active_employees:
 			leave_approvers = department_approver_map.get(employee.department_name, []).append(
 				employee.leave_approver
 			)
 
-			if consolidate_leave_types:
-				row = frappe._dict()
-			else:
-				row = frappe._dict({"leave_type": leave_type})
+			# if consolidate_leave_types:
+			# 	row = frappe._dict()
+			# else:
+			row = frappe._dict({"leave_type": leave_type})
 
 			row.employee = employee.name
 			row.employee_name = employee.employee_name
