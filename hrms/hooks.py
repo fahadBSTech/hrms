@@ -176,28 +176,30 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	"all": [
-		"hrms.hr.doctype.interview.interview.send_interview_reminder",
-	],
-	"hourly": [
-		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
-	],
-	"hourly_long": [
-		"hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
-	],
-	"daily": [
-		"hrms.controllers.employee_reminders.send_birthday_reminders",
-		"hrms.controllers.employee_reminders.send_work_anniversary_reminders",
-		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
-		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
-	],
-	"daily_long": [
-		"hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
-		"hrms.hr.utils.generate_leave_encashment",
-		"hrms.hr.utils.allocate_earned_leaves",
-	],
-	"weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
-	"monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],
+    "all": [
+        "hrms.hr.doctype.interview.interview.send_interview_reminder",
+    ],
+    "hourly": [
+        "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
+    ],
+    "daily": [
+        "hrms.controllers.employee_reminders.send_birthday_reminders",
+        "hrms.controllers.employee_reminders.send_work_anniversary_reminders",
+        "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
+        "hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
+    ],
+    "daily_long": [
+        "hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
+        "hrms.hr.utils.generate_leave_encashment",
+        "hrms.hr.utils.allocate_earned_leaves",
+    ],
+    "weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
+    "monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],
+    "cron": {
+        "0 23 * * *": [
+            "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts"
+				]
+		}
 }
 
 advance_payment_doctypes = ["Gratuity", "Employee Advance"]

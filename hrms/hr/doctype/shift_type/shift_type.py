@@ -25,6 +25,8 @@ from hrms.utils.holiday_list import get_holiday_dates_between
 class ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self):
+		self.process_attendance_after = datetime.today().replace(hour=0, minute=0, second=0)
+		self.last_sync_of_checkin = datetime.today().replace(hour=23, minute=59, second=0)
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -84,8 +86,7 @@ class ShiftType(Document):
 			filters={
 				"skip_auto_attendance": 0,
 				"attendance": ("is", "not set"),
-				"time": (">=", self.process_attendance_after),
-				"shift_actual_end": ("<", self.last_sync_of_checkin),
+				"time": ["between", self.process_attendance_after, self.last_sync_of_checkin],
 				"shift": self.name,
 			},
 			order_by="employee,time",

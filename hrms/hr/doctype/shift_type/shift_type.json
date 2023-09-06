@@ -150,7 +150,7 @@
   {
    "description": "Attendance will be marked automatically only after this date.",
    "fieldname": "process_attendance_after",
-   "fieldtype": "Date",
+   "fieldtype": "Datetime",
    "label": "Process Attendance After"
   },
   {
@@ -168,7 +168,7 @@
   }
  ],
  "links": [],
- "modified": "2023-08-11 20:30:13.358549",
+ "modified": "2023-09-05 16:31:39.830152",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Type",
