@@ -46,17 +46,18 @@ frappe.ui.form.on("Work From Home", "validate", async function (frm) {
           "from_date",
           "Between",
           [frm.doc.from_date, frm.doc.to_date]
-        ]
+        ],
+        ["Leave Application", "employee", "=", frm.doc.employee]
       ],
       fields: [],
       distinct: false
     }
   });
   if (leaveRes.message > 0) {
-    frappe.throw("You have already leave on the same dates");
+    frappe.throw("Already leaves applied for the same dates");
     frappe.validated = false;
   } else if (frm.doc.from_date && frm.doc.from_date < get_today()) {
-    frappe.throw("You can not select past date in From Date");
+    frappe.throw("Can't select past date in From Date");
     frappe.validated = false;
   } else if (frm.doc.to_date && frm.doc.to_date < frm.doc.from_date) {
     frappe.throw("To date should be greater than from date");
