@@ -36,31 +36,33 @@ frappe.ui.form.on("Work From Home", {
 });
 
 frappe.ui.form.on("Work From Home", "validate", async function (frm) {
-  const leaveRes = await frm.call({
-    method: "frappe.desk.reportview.get_count",
-    args: {
-      doctype: "Leave Application",
-      filters: [
-        [
-          "Leave Application",
-          "from_date",
-          "Between",
-          [frm.doc.from_date, frm.doc.to_date]
+  if (frm.doc.status === "Requested") {
+    const leaveRes = await frm.call({
+      method: "frappe.desk.reportview.get_count",
+      args: {
+        doctype: "Leave Application",
+        filters: [
+          [
+            "Leave Application",
+            "from_date",
+            "Between",
+            [frm.doc.from_date, frm.doc.to_date]
+          ],
+          ["Leave Application", "employee", "=", frm.doc.employee]
         ],
-        ["Leave Application", "employee", "=", frm.doc.employee]
-      ],
-      fields: [],
-      distinct: false
+        fields: [],
+        distinct: false
+      }
+    });
+    if (leaveRes.message > 0) {
+      frappe.throw("Already leaves applied for the same dates");
+      frappe.validated = false;
+    } else if (frm.doc.from_date && frm.doc.from_date < get_today()) {
+      frappe.throw("Can't select past date in From Date");
+      frappe.validated = false;
+    } else if (frm.doc.to_date && frm.doc.to_date < frm.doc.from_date) {
+      frappe.throw("To date should be greater than from date");
+      frappe.validated = false;
     }
-  });
-  if (leaveRes.message > 0) {
-    frappe.throw("Already leaves applied for the same dates");
-    frappe.validated = false;
-  } else if (frm.doc.from_date && frm.doc.from_date < get_today()) {
-    frappe.throw("Can't select past date in From Date");
-    frappe.validated = false;
-  } else if (frm.doc.to_date && frm.doc.to_date < frm.doc.from_date) {
-    frappe.throw("To date should be greater than from date");
-    frappe.validated = false;
   }
 });

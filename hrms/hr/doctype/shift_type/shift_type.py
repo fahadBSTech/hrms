@@ -25,8 +25,9 @@ from hrms.utils.holiday_list import get_holiday_dates_between
 class ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self):
-		self.process_attendance_after = datetime.today().replace(hour=0, minute=0, second=0)
-		self.last_sync_of_checkin = datetime.today().replace(hour=23, minute=59, second=0)
+		start_date_time, end_date_time = get_month_start_end_dates_with_time()
+		self.process_attendance_after = start_date_time
+		self.last_sync_of_checkin = end_date_time
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -284,3 +285,17 @@ def process_auto_attendance_for_all_shifts():
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
 		doc.process_auto_attendance()
+
+def get_month_start_end_dates_with_time(year = datetime.now().year, month = datetime.now().month):
+    # Create a datetime object for the first day of the month with time 00:00:00
+    start_date = datetime.datetime(year, month, 1, 0, 0, 0)
+
+    # Calculate the last day of the month by going to the next month's first day and subtracting one second
+    if month == 12:
+        end_date = datetime.datetime(
+            year + 1, 1, 1, 0, 0, 0) - datetime.timedelta(seconds=1)
+    else:
+        end_date = datetime.datetime(
+            year, month + 1, 1, 0, 0, 0) - datetime.timedelta(seconds=1)
+
+    return start_date, end_date

@@ -11,6 +11,7 @@ from hrms.hr.doctype.shift_assignment.shift_assignment import (
 	get_actual_start_end_datetime_of_shift,
 )
 from hrms.hr.utils import validate_active_employee
+from datetime import datetime
 
 
 class EmployeeCheckin(Document):
@@ -18,6 +19,8 @@ class EmployeeCheckin(Document):
 		validate_active_employee(self.employee)
 		self.validate_duplicate_log()
 		self.fetch_shift()
+		if self.log_type == 'OUT':
+			self.validate_current_day_checkin()
 
 	def validate_duplicate_log(self):
 		doc = frappe.db.exists(
@@ -34,6 +37,14 @@ class EmployeeCheckin(Document):
 			frappe.throw(
 				_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
 			)
+	
+	def validate_current_day_checkin(self):
+		query = "SELECT COUNT(log_type) FROM `tabEmployee Checkin` WHERE CAST(time as DATE)='%s' AND log_type='%s' AND employee = '%s'" % (self.time.split(" ")[0], "IN", self.employee)
+		docs = frappe.db.sql(query)
+		if docs[0][0] < 1:
+			frappe.throw(_("Please add check-in first"))
+		else:
+			pass
 
 	def fetch_shift(self):
 		shift_actual_timings = get_actual_start_end_datetime_of_shift(

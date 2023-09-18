@@ -3,9 +3,12 @@
 # import json
 import frappe
 from frappe.model.document import Document
-from frappe.integrations.utils import make_post_request
 
 class WorkFromHome(Document):
+	def before_submit(self):
+		if self.status != 'Approved' and self.status != 'Rejected':
+			frappe.throw("Only document with status 'Approved' or 'Rejected' can be submitable.")
+
 	def after_insert(self):
 		try:
 			if self.status == 'Requested':
