@@ -69,7 +69,6 @@ class ShiftType(Document):
 			self.mark_absent_for_dates_with_no_attendance(employee)
 
 	def get_employee_checkins(self) -> list[dict]:
-		print("after: {0} - last: {1}".format(self.process_attendance_after, self.last_sync_of_checkin))
 		return frappe.get_all(
 			"Employee Checkin",
 			fields=[
