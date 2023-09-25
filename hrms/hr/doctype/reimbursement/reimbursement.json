@@ -12,7 +12,6 @@
   "description",
   "reimbursement_type",
   "total_amount",
-  "image_attachment",
   "amended_from"
  ],
  "fields": [
@@ -21,7 +20,8 @@
    "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "Employee",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.employee_name",
@@ -39,13 +39,6 @@
    "label": "Description"
   },
   {
-   "fieldname": "image_attachment",
-   "fieldtype": "Attach Image",
-   "label": "Attachments",
-   "length": 10,
-   "reqd": 1
-  },
-  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -58,36 +51,26 @@
    "fieldname": "reimbursement_type",
    "fieldtype": "Link",
    "label": "Reimbursement Type",
-   "options": "Reimbursement Types"
+   "options": "Reimbursement Types",
+   "reqd": 1
   },
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
-   "label": "Total Amount"
+   "label": "Total Amount",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-08-21 18:14:47.434657",
+ "max_attachments": 10,
+ "modified": "2023-09-25 12:22:40.727925",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Reimbursement",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

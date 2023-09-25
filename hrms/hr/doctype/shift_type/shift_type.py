@@ -53,7 +53,6 @@ class ShiftType(Document):
 				in_time,
 				out_time,
 			) = self.get_attendance(single_shift_logs)
-
 			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
@@ -70,6 +69,7 @@ class ShiftType(Document):
 			self.mark_absent_for_dates_with_no_attendance(employee)
 
 	def get_employee_checkins(self) -> list[dict]:
+		print("after: {0} - last: {1}".format(self.process_attendance_after, self.last_sync_of_checkin))
 		return frappe.get_all(
 			"Employee Checkin",
 			fields=[
@@ -87,7 +87,8 @@ class ShiftType(Document):
 			filters={
 				"skip_auto_attendance": 0,
 				"attendance": ("is", "not set"),
-				"time": ["between", self.process_attendance_after, self.last_sync_of_checkin],
+				"time": [">=", self.process_attendance_after],
+				"time": ["<=", self.last_sync_of_checkin],
 				"shift": self.name,
 			},
 			order_by="employee,time",
@@ -288,14 +289,21 @@ def process_auto_attendance_for_all_shifts():
 
 def get_month_start_end_dates_with_time(year = datetime.now().year, month = datetime.now().month):
     # Create a datetime object for the first day of the month with time 00:00:00
-    start_date = datetime.datetime(year, month, 1, 0, 0, 0)
+    start_date = datetime(year, month, 1, 0, 0, 0)
+    
+		# Create end datetime for the current day
+    today = datetime.today()
+    end_date = today.replace(hour=23, minute=59, second=0)
+    end_date = datetime.fromisoformat(str(end_date))
+    end_date = end_date.replace(microsecond=0)
 
+		# TODO: save for future use
     # Calculate the last day of the month by going to the next month's first day and subtracting one second
-    if month == 12:
-        end_date = datetime.datetime(
-            year + 1, 1, 1, 0, 0, 0) - datetime.timedelta(seconds=1)
-    else:
-        end_date = datetime.datetime(
-            year, month + 1, 1, 0, 0, 0) - datetime.timedelta(seconds=1)
+    # if month == 12:
+    #     end_date = datetime(
+    #         year + 1, 1, 1, 0, 0, 0) - timedelta(seconds=1)
+    # else:
+    #     end_date = datetime(
+    #         year, month + 1, 1, 0, 0, 0) - timedelta(seconds=1)
 
     return start_date, end_date
