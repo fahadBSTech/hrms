@@ -75,7 +75,9 @@ class LeaveApplication(Document):
 		self.validate_applicable_after()
 
 	def after_insert(self):
-		self.slack_notify()
+		# TODO: comment to stop slack service
+		# self.slack_notify()
+		pass
 
 	def slack_notify(self):
 		try:
