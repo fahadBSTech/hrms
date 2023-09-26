@@ -65,7 +65,7 @@ frappe.ui.form.on('Payroll Entry', {
 			&& !cint(frm.doc.salary_slips_created)
 			&& (frm.doc.docstatus != 2)
 		) {
-			if (frm.doc.docstatus == 0) {
+			if (frm.doc.docstatus == 0 && !frm.is_new()) {
 				frm.page.clear_primary_action();
 				frm.page.set_primary_action(__("Create Salary Slips"), () => {
 					frm.save("Submit").then(() => {
@@ -128,9 +128,13 @@ frappe.ui.form.on('Payroll Entry', {
 	add_context_buttons: function (frm) {
 		if (frm.doc.salary_slips_submitted || (frm.doc.__onload && frm.doc.__onload.submitted_ss)) {
 			frm.events.add_bank_entry_button(frm);
-		} else if (frm.doc.salary_slips_created && frm.doc.status != 'Queued') {
-			frm.add_custom_button(__("Submit Salary Slip"), function () {
+		} else if (frm.doc.salary_slips_created && frm.doc.status !== "Queued") {
+			frm.add_custom_button(__("Submit Salary Slip"), function() {
 				submit_salary_slip(frm);
+			}).addClass("btn-primary");
+		} else if (!frm.doc.salary_slips_created && frm.doc.status === "Failed") {
+			frm.add_custom_button(__("Create Salary Slips"), function() {
+				frm.trigger("create_salary_slips");
 			}).addClass("btn-primary");
 		}
 	},
@@ -196,10 +200,9 @@ frappe.ui.form.on('Payroll Entry', {
 
 	get_employee_filters: function (frm) {
 		let filters = {};
-		filters['salary_slip_based_on_timesheet'] = frm.doc.salary_slip_based_on_timesheet;
 
 		let fields = ['company', 'start_date', 'end_date', 'payroll_frequency', 'payroll_payable_account',
-			'currency', 'department', 'branch', 'designation'];
+			'currency', 'department', 'branch', 'designation', 'salary_slip_based_on_timesheet'];
 
 		fields.forEach(field => {
 			if (frm.doc[field]) {
@@ -295,6 +298,7 @@ frappe.ui.form.on('Payroll Entry', {
 
 	salary_slip_based_on_timesheet: function (frm) {
 		frm.toggle_reqd(['payroll_frequency'], !frm.doc.salary_slip_based_on_timesheet);
+		hrms.set_payroll_frequency_to_null(frm);
 	},
 
 	set_start_end_dates: function (frm) {
