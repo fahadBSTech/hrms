@@ -5,7 +5,8 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint, get_datetime
+from frappe.utils import (cint, get_datetime, DATE_FORMAT)
+import pytz
 
 from hrms.hr.doctype.shift_assignment.shift_assignment import (
 	get_actual_start_end_datetime_of_shift,
@@ -17,10 +18,24 @@ from datetime import datetime
 class EmployeeCheckin(Document):
 	def validate(self):
 		validate_active_employee(self.employee)
+		self.validate_date_time()
 		self.validate_duplicate_log()
 		self.fetch_shift()
+		self.validate_check_leave_on_same_day()
 		if self.log_type == 'OUT':
 			self.validate_current_day_checkin()
+	
+	def validate_date_time(self):
+		date_format = f"{DATE_FORMAT} %H%M%S"
+		current_date_time = datetime.strptime(datetime.now(pytz.timezone('Asia/Karachi')).strftime(date_format), date_format)
+		if get_datetime(self.time) > current_date_time:
+			frappe.throw(_("check-{0} can't be set for the future date/time").format(self.log_type.lower()))
+	
+	def validate_check_leave_on_same_day(self):
+		checkin_date = self.time.split(' ')[0]
+		doc = frappe.db.exists('Leave Application', {"employee": self.employee, "from_date": [">=", checkin_date], "to_date": ["<=", checkin_date], "status": "Approved"})
+		if doc:
+			frappe.throw(_("<b>Not Permitted:</b> Leave has been approved on the same date {0}").format(checkin_date))
 
 	def validate_duplicate_log(self):
 		doc = frappe.db.exists(
