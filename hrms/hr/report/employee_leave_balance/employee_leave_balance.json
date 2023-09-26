@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 3,
  "is_standard": "Yes",
- "modified": "2023-08-17 16:57:20.120362",
+ "modified": "2023-09-25 16:36:43.154007",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Leave Balance",
@@ -19,15 +19,5 @@
  "report_name": "Employee Leave Balance",
  "report_script": "",
  "report_type": "Script Report",
- "roles": [
-  {
-   "role": "HR Manager"
-  },
-  {
-   "role": "Employee"
-  },
-  {
-   "role": "Project Manager"
-  }
- ]
+ "roles": []
 }
