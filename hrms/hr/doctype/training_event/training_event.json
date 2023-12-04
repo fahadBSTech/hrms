@@ -129,9 +129,10 @@
   },
   {
    "fieldname": "course",
-   "fieldtype": "Data",
+   "fieldtype": "Table",
    "in_standard_filter": 1,
-   "label": "Course"
+   "label": "Course",
+   "options": "Training Event Courses"
   },
   {
    "fieldname": "location",
@@ -198,7 +199,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2022-04-28 13:29:35.139497",
+ "modified": "2023-12-04 16:35:55.235247",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Training Event",
