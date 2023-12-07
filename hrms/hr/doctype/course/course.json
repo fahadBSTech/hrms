@@ -9,14 +9,16 @@
  "engine": "InnoDB",
  "field_order": [
   "course_name",
-  "course_links"
+  "course_links",
+  "course_description",
+  "course_skill"
  ],
  "fields": [
   {
    "fieldname": "course_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Course Name",
+   "label": "Name",
    "reqd": 1,
    "unique": 1
   },
@@ -25,11 +27,23 @@
    "fieldtype": "Table",
    "label": "Course Links",
    "options": "Course Content Links"
+  },
+  {
+   "fieldname": "course_description",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "course_skill",
+   "fieldtype": "Table MultiSelect",
+   "label": "Skills",
+   "options": "Course Skill"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-04 16:32:45.309062",
+ "modified": "2023-12-06 17:25:50.104843",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Course",
@@ -49,8 +63,10 @@
    "write": 1
   }
  ],
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
+ "title_field": "course_name",
  "track_changes": 1
 }
