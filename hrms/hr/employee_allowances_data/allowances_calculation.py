@@ -33,9 +33,7 @@ def calculate_employee_fuel_allowance():
         leaves = count_leaves(emp.name, startOfPreviousMonth, endOfPreviousMonth)
         wfh_days = count_work_from_home(emp.name, startOfPreviousMonth,
                 endOfPreviousMonth)
-        print("total days", total_days)
         working_days = total_days - leaves - wfh_days
-        print("working days", working_days)
         fuel_allowance = calculate_allowance(emp, working_days,
                 average_fuel_allowance)
         create_employee_fuel_allowance_record(emp, fuel_allowance, endOfPreviousMonth)
@@ -80,13 +78,11 @@ def get_average_fuel_allowance_for_month(start_date, end_date):
 
     if not fuel_allowances:
         return 0
-    print("")
     # Calculate the difference between fuel_amount and base_fuel_amount for each record
     total_difference = sum(fuel['fuel_amount'] - fuel['base_fuel_amount'] for fuel in fuel_allowances)
 
     # Calculate the average of these differences
     average_difference = total_difference / len(fuel_allowances)
-    print("average fuel allowance", average_difference)
     return average_difference
 
 
@@ -97,7 +93,6 @@ def calculate_allowance(employee, working_days, fuel_allowance):
 
     # Example calculation, adjust as needed
 
-    print ('this is employee', employee)
     working_days = int(working_days)  # Convert to int if it's not already
     fuel_allowance = float(fuel_allowance)  # Convert to float if it's not already
     distance = float(frappe.db.get_value('Employee', employee,
@@ -114,17 +109,20 @@ def calculate_allowance(employee, working_days, fuel_allowance):
 
 
 def fetch_public_holidays(startDate, endDate):
+    # Retrieve the default holiday list for the given company
+    default_holiday_list_name = frappe.get_value('Company', 'Bitsol Technologies', 'default_holiday_list')
+
+    if not default_holiday_list_name:
+        return 0
+
+    # Fetch public holidays within the specified date range from the default holiday list
     public_holidays = frappe.get_all('Holiday',
-            filters={'holiday_date': ['between', [startDate,
-            endDate]]}, fields=['holiday_date'])
-
-    # Return the count of public holidays
-
+                                     filters={'parent': default_holiday_list_name, 
+                                              'holiday_date': ['between', [startDate, endDate]]},
+                                     fields=['holiday_date'])
     return len(public_holidays)
 
-
 def create_employee_fuel_allowance_record(employee, fuel_allowance, date):
-	print("int the function of record insert", employee, fuel_allowance)
 	if fuel_allowance < 1000:
 	    fuel_allowance = 1000
 	elif fuel_allowance > 10000:
