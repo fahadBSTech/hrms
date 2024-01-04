@@ -194,8 +194,9 @@ scheduler_events = {
         "hrms.hr.utils.allocate_earned_leaves",
     ],
     "weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
-    "monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],
-    "cron": {
+    "monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly", "hrms.hr.employee_allowances_data.allowances_calculation.calculate_employee_fuel_allowance"],
+	"yearly": ["hrms.hr.employee_allowances_data.allowances_calculation.reset_medical_allowances"],
+	"cron": {
         "0 23 * * *": [
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts"
 				]
@@ -271,6 +272,7 @@ permission_query_conditions = {
 has_permission = {
 "Training Event" : "hrms.permissions.has_te_permission_query"
 }
+
 
 # exempt linked doctypes from being automatically cancelled
 #
