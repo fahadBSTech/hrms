@@ -53,23 +53,27 @@ frappe.query_reports["Employee Leave Balance"] = {
   ],
 
   onload: () => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const from_date = new Date(currentYear, 0, 1); // January 1 of the current year
+    const to_date = new Date(currentYear, 11, 31); // December 31 of the current year
     frappe.call({
       type: "GET",
       method: "hrms.hr.utils.get_leave_period",
       args: {
-        from_date: frappe.defaults.get_default("year_start_date"),
-        to_date: frappe.defaults.get_default("year_end_date"),
+        from_date,
+        to_date,
         company: frappe.defaults.get_user_default("Company")
       },
       freeze: true,
       callback: data => {
         frappe.query_report.set_filter_value(
           "from_date",
-          data.message[0].from_date
+          from_date
         );
         frappe.query_report.set_filter_value(
           "to_date",
-          data.message[0].to_date
+          to_date
         );
       }
     });
