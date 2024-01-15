@@ -55,8 +55,8 @@ frappe.query_reports["Employee Leave Balance"] = {
   onload: () => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const from_date = new Date(currentYear, 0, 1); // January 1 of the current year
-    const to_date = new Date(currentYear, 11, 31); // December 31 of the current year
+    const from_date = currentYear + '-01-01'; // January 1 of the current year
+    const to_date = currentYear + '-12-31'; // December 31 of the current year
     frappe.call({
       type: "GET",
       method: "hrms.hr.utils.get_leave_period",
