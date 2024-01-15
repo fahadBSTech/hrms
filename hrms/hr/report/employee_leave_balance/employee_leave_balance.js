@@ -1,6 +1,9 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
-
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const from_date = currentYear + '-01-01'; // January 1 of the current year
+const to_date = currentYear + '-12-31'; // December 31 of the current year
 frappe.query_reports["Employee Leave Balance"] = {
   filters: [
     {
@@ -8,14 +11,14 @@ frappe.query_reports["Employee Leave Balance"] = {
       label: __("From Date"),
       fieldtype: "Date",
       reqd: 1,
-      default: frappe.defaults.get_default("year_start_date")
+      default: from_date
     },
     {
       fieldname: "to_date",
       label: __("To Date"),
       fieldtype: "Date",
       reqd: 1,
-      default: frappe.defaults.get_default("year_end_date")
+      default: to_date
     },
     {
       label: __("Company"),
@@ -53,10 +56,6 @@ frappe.query_reports["Employee Leave Balance"] = {
   ],
 
   onload: () => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const from_date = currentYear + '-01-01'; // January 1 of the current year
-    const to_date = currentYear + '-12-31'; // December 31 of the current year
     frappe.call({
       type: "GET",
       method: "hrms.hr.utils.get_leave_period",
