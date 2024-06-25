@@ -13,7 +13,6 @@
   "employee_name",
   "working_hours",
   "status",
-  "working_from",
   "leave_type",
   "leave_application",
   "column_break0",
@@ -38,14 +37,13 @@
    "options": "Simple"
   },
   {
-   "default": "HR-ATT-.YYYY.-",
    "fieldname": "naming_series",
-   "fieldtype": "Data",
-   "hidden": 1,
+   "fieldtype": "Select",
    "label": "Series",
    "no_copy": 1,
    "oldfieldname": "naming_series",
    "oldfieldtype": "Select",
+   "options": "HR-ATT-.YYYY.-",
    "reqd": 1,
    "set_only_once": 1
   },
@@ -88,7 +86,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "Present\nLeave\nHalf Day\nOn Leave\nAbsent\nWork From Home",
+   "options": "\nPresent\nAbsent\nOn Leave\nHalf Day\nWork From Home",
    "reqd": 1,
    "search_index": 1
   },
@@ -188,36 +186,28 @@
   },
   {
    "depends_on": "shift",
-   "fetch_from": "shift.start_time",
    "fieldname": "in_time",
-   "fieldtype": "Time",
-   "label": "Check-in Time"
+   "fieldtype": "Datetime",
+   "label": "In Time",
+   "read_only": 1
   },
   {
    "depends_on": "shift",
-   "fetch_from": "shift.end_time",
    "fieldname": "out_time",
-   "fieldtype": "Time",
-   "label": "Check-out Time"
+   "fieldtype": "Datetime",
+   "label": "Out Time",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_18",
    "fieldtype": "Column Break"
-  },
-  {
-   "default": "Office",
-   "depends_on": "eval:doc.status == 'Present'",
-   "fieldname": "working_from",
-   "fieldtype": "Select",
-   "label": "Working From",
-   "options": "Office\nHome"
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-09-25 11:06:43.667016",
+ "modified": "2024-04-05 20:55:02.905452",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
@@ -272,6 +262,7 @@
    "read": 1,
    "report": 1,
    "role": "Employee",
+   "select": 1,
    "share": 1
   }
  ],

@@ -24,6 +24,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "in_standard_filter": 1,
    "label": "Employee",
    "options": "Employee",
    "reqd": 1,
@@ -42,8 +43,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Log Type",
-   "options": "IN\nOUT",
-   "reqd": 1
+   "options": "\nIN\nOUT"
   },
   {
    "fieldname": "shift",
@@ -63,25 +63,23 @@
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Time",
+   "permlevel": 1,
    "reqd": 1
   },
   {
    "fieldname": "device_id",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Location / Device ID"
   },
   {
    "default": "0",
    "fieldname": "skip_auto_attendance",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Skip Auto Attendance"
   },
   {
    "fieldname": "attendance",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Attendance Marked",
    "options": "Attendance",
    "read_only": 1
@@ -112,7 +110,7 @@
   }
  ],
  "links": [],
- "modified": "2023-09-06 17:12:43.527834",
+ "modified": "2024-04-02 01:50:23.150627",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
@@ -131,6 +129,80 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "import": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "import": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Employee",
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Employee"
   }
  ],
  "sort_field": "modified",

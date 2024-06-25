@@ -11,7 +11,6 @@
   "naming_series",
   "employee",
   "employee_name",
-  "employee_user_id",
   "column_break_4",
   "leave_type",
   "company",
@@ -28,23 +27,24 @@
   "section_break_7",
   "leave_approver",
   "leave_approver_name",
-  "approval_slack_uid",
   "follow_via_email",
   "column_break_18",
   "posting_date",
   "status",
   "sb_other_details",
+  "salary_slip",
+  "color",
   "column_break_17",
+  "letter_head",
   "amended_from"
  ],
  "fields": [
   {
-   "default": "HR-LAP-.YYYY.-",
    "fieldname": "naming_series",
-   "fieldtype": "Data",
-   "hidden": 1,
+   "fieldtype": "Select",
    "label": "Series",
    "no_copy": 1,
+   "options": "HR-LAP-.YYYY.-",
    "print_hide": 1,
    "reqd": 1,
    "set_only_once": 1
@@ -85,7 +85,6 @@
    "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Department",
    "options": "Department",
    "read_only": 1
@@ -124,7 +123,7 @@
    "label": "Half Day"
   },
   {
-   "depends_on": "eval:doc.half_day && (doc.from_date != doc.to_date)",
+   "depends_on": "eval:doc.half_day && doc.from_date && doc.to_date && (doc.from_date != doc.to_date)",
    "fieldname": "half_day_date",
    "fieldtype": "Date",
    "label": "Half Day Date"
@@ -152,15 +151,13 @@
   {
    "fieldname": "section_break_7",
    "fieldtype": "Section Break",
-   "label": "Approval",
-   "read_only": 1
+   "label": "Approval"
   },
   {
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User",
-   "read_only": 1
+   "options": "User"
   },
   {
    "fieldname": "leave_approver_name",
@@ -189,7 +186,6 @@
    "fieldtype": "Date",
    "label": "Posting Date",
    "no_copy": 1,
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -215,6 +211,29 @@
    "fieldtype": "Column Break"
   },
   {
+   "fieldname": "salary_slip",
+   "fieldtype": "Link",
+   "label": "Salary Slip",
+   "options": "Salary Slip",
+   "print_hide": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Letter Head",
+   "options": "Letter Head",
+   "print_hide": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "color",
+   "fieldtype": "Color",
+   "label": "Color",
+   "print_hide": 1
+  },
+  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "ignore_user_permissions": 1,
@@ -229,23 +248,6 @@
    "fieldname": "sb_other_details",
    "fieldtype": "Section Break",
    "label": "Other Details"
-  },
-  {
-   "fetch_from": "leave_approver.slack_uid",
-   "fieldname": "approval_slack_uid",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Approval Slack ID",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "fetch_from": "employee.user_id",
-   "fieldname": "employee_user_id",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Employee User ID",
-   "read_only": 1
   }
  ],
  "icon": "fa fa-calendar",
@@ -253,7 +255,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2023-09-20 17:14:41.376841",
+ "modified": "2024-04-08 13:56:03.818019",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

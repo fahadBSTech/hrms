@@ -10,22 +10,10 @@
    "card": "Employee Exits (This Year)"
   },
   {
-   "card": "Employees Joining (Next Quarter)"
+   "card": "Employees Joining (This Quarter)"
   },
   {
-   "card": "Employees Relieving (Next Quarter)"
-  },
-  {
-   "card": "New Hires (This Year)"
-  },
-  {
-   "card": "Total Half Days (Today)"
-  },
-  {
-   "card": "Total Leaves (Today)"
-  },
-  {
-   "card": "Total Work From Homes (Today)"
+   "card": "Employees Relieving (This Quarter)"
   }
  ],
  "charts": [
@@ -60,24 +48,16 @@
   {
    "chart": "Department Wise Employee Count",
    "width": "Half"
-  },
-  {
-   "chart": "Monthly Attendance",
-   "width": "Half"
-  },
-  {
-   "chart": "Employees Total Work From Homes",
-   "width": "Half"
   }
  ],
- "creation": "2020-07-22 11:56:33.015888",
+ "creation": "2023-11-17 14:10:56.741833",
  "dashboard_name": "Human Resource",
  "docstatus": 0,
  "doctype": "Dashboard",
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2023-09-15 11:20:35.455754",
+ "modified": "2024-01-08 14:06:32.104261",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Human Resource",
