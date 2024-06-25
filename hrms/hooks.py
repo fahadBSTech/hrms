@@ -248,9 +248,11 @@ global_search_doctypes = {
 	],
 }
 
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "hrms.event.get_events"
-# }
+override_whitelisted_methods = {
+	# "frappe.desk.doctype.event.event.get_events": "hrms.event.get_events"
+	"hrms.utils.holiday_list.get_current_month_working_days": "hrms.utils.holiday_list.get_current_month_working_days"
+}
+
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
