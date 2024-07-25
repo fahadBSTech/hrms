@@ -183,7 +183,7 @@
    "type": "Link"
   }
  ],
- "modified": "2023-08-30 15:05:16.286768",
+ "modified": "2024-07-03 15:41:47.197206",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Recruitment",
@@ -212,7 +212,7 @@
    "role": "HR User"
   }
  ],
- "sequence_id": 10.0,
+ "sequence_id": 11.0,
  "shortcuts": [
   {
    "color": "Grey",
