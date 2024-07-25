@@ -207,7 +207,6 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
     :param check_in_out_type: One of: 'Alternating entries as IN and OUT during the same shift', 'Strictly based on Log Type in Employee Checkin'
     :param working_hours_calc_type: One of: 'First Check-in and Last Check-out', 'Every Valid Check-in and Check-out'
     """
-    print("hello")
     total_hours = 0
     in_time = out_time = None
     if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
@@ -251,14 +250,11 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
                         in_time = in_log.time
                 elif not out_log:
                     out_log = log if log.log_type == "OUT" else None
-            out_log = in_log.shift_end if (in_log and not out_log) else out_log
-            print(in_log.time, get_datetime(out_log.time), in_log.shift_end)
+            out_log = out_log.shift_end if (in_log and not out_log) else out_log
+            print(out_log.shift_end)
             if in_log and out_log:
-                total_hours += time_diff_in_hours(in_log.time, out_log)
-
-    return total_hours, in_time, out_log
-
-
+                out_time = out_log.time
+               
 
 def time_diff_in_hours(start, end):
 	return round(float((end - start).total_seconds()) / 3600, 2)

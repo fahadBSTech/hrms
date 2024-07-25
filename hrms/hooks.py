@@ -194,7 +194,7 @@ scheduler_events = {
     "monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly", "hrms.hr.employee_allowances_data.allowances_calculation.calculate_employee_fuel_allowance"],
 	"yearly": ["hrms.hr.employee_allowances_data.allowances_calculation.reset_medical_allowances"],
 	"cron": {
-        "0 23 * * *": [
+        "0 2 * * *": [
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts"
 				]
 		}
