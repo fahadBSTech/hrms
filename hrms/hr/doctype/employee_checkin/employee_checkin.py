@@ -24,13 +24,13 @@ class EmployeeCheckin(Document):
 		self.validate_check_leave_on_same_day()
 		if self.log_type == 'OUT':
 			self.validate_current_day_checkin()
-	
+
 	def validate_date_time(self):
 		date_format = f"{DATE_FORMAT} %H%M%S"
 		current_date_time = datetime.strptime(datetime.now(pytz.timezone('Asia/Karachi')).strftime(date_format), date_format)
 		if get_datetime(self.time) > current_date_time:
 			frappe.throw(_("check-{0} can't be set for the future date/time").format(self.log_type.lower()))
-	
+
 	def validate_check_leave_on_same_day(self):
 		checkin_date = self.time.split(' ')[0]
 		doc = frappe.db.exists('Leave Application', {"employee": self.employee, "from_date": [">=", checkin_date], "to_date": ["<=", checkin_date], "status": "Approved"})
@@ -52,7 +52,7 @@ class EmployeeCheckin(Document):
 			frappe.throw(
 				_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
 			)
-	
+
 	def validate_current_day_checkin(self):
 		query = "SELECT COUNT(log_type) FROM `tabEmployee Checkin` WHERE CAST(time as DATE)='%s' AND log_type='%s' AND employee = '%s'" % (self.time.split(" ")[0], "IN", self.employee)
 		docs = frappe.db.sql(query)
@@ -207,7 +207,6 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
     :param check_in_out_type: One of: 'Alternating entries as IN and OUT during the same shift', 'Strictly based on Log Type in Employee Checkin'
     :param working_hours_calc_type: One of: 'First Check-in and Last Check-out', 'Every Valid Check-in and Check-out'
     """
-    print("hello")
     total_hours = 0
     in_time = out_time = None
     if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
