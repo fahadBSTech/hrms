@@ -196,7 +196,9 @@ scheduler_events = {
 	"cron": {
         "0 23 * * *": [
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts"
-				]
+				],
+	"*/15 * * * *": [
+		"hrms.hr.doctype.shift_type.shift_type.notify_employees_to_checkin_or_checkout"]
 		}
 }
 
