@@ -292,39 +292,48 @@ def add_holidays(events, start, end, employee=None):
 		)
 
 
+
+
+
+
+
 def mark_attendance(
-	employee,
-	attendance_date,
-	status,
-	shift=None,
-	leave_type=None,
-	late_entry=False,
-	early_exit=False,
+    employee,
+    attendance_date,
+    status,
+    shift=None,
+    leave_type=None,
+    late_entry=False,
+    early_exit=False,
 ):
-	savepoint = "attendance_creation"
+    savepoint = "attendance_creation"
 
-	try:
-		frappe.db.savepoint(savepoint)
-		attendance = frappe.new_doc("Attendance")
-		attendance.update(
-			{
-				"doctype": "Attendance",
-				"employee": employee,
-				"attendance_date": attendance_date,
-				"status": status,
-				"shift": shift,
-				"leave_type": leave_type,
-				"late_entry": late_entry,
-				"early_exit": early_exit,
-			}
-		)
-		attendance.insert()
-		attendance.submit()
-	except (DuplicateAttendanceError, OverlappingShiftAttendanceError):
-		frappe.db.rollback(save_point=savepoint)
-		return
+    try:
+        in_time = out_time = frappe.utils.now_datetime()
+        frappe.db.savepoint(savepoint)
+        attendance = frappe.new_doc("Attendance")
+        attendance.update(
+            {
+                "doctype": "Attendance",
+                "employee": employee,
+                "attendance_date": attendance_date,
+                "status": status,
+                "shift": shift,
+                "leave_type": leave_type,
+                "late_entry": late_entry,
+                "early_exit": early_exit,
+                "in_time" : in_time,
+                "out_time": out_time
+            }
+        )
+        attendance.insert()
+        attendance.submit()
+    except (DuplicateAttendanceError, OverlappingShiftAttendanceError):
+        frappe.db.rollback(save_point=savepoint)
+        return
 
-	return attendance.name
+    return attendance.name
+
 
 
 @frappe.whitelist()
