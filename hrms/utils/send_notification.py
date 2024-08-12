@@ -17,7 +17,7 @@ def send_push_notification(token, title=None, body=None, log=None):
     message = messaging.MulticastMessage(
         notification=messaging.Notification(
             title=title,
-            body=body
+            body=message
         ),
         tokens=token
     )

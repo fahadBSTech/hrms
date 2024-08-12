@@ -292,12 +292,8 @@ class ShiftType(Document):
 def process_auto_attendance_for_all_shifts():
     shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
     for shift in shift_list:
-        if not shift.lower() == "test shift":
-            continue
         doc = frappe.get_cached_doc("Shift Type", shift)
         doc.process_auto_attendance()
-
-
 
 def get_month_start_end_dates_with_time(year = datetime.now().year, month = datetime.now().month):
     # Create a datetime object for the first day of the month with time 00:00:00
@@ -334,7 +330,7 @@ def get_time_difference(obj1, obj2):
 
 
 
-def get_assigned_employees_with_specified_threshold(name, from_date=None,
+def  get_assigned_employees_with_specified_threshold(name, from_date=None,
                                                     start_time=None, end_time=None) -> list[str]:
     filters = {"shift_type": name, "docstatus": "1", "status": "Active"}
     if from_date:
@@ -348,23 +344,22 @@ def get_assigned_employees_with_specified_threshold(name, from_date=None,
     if start_time:
         assigned_employees = [
             emp for emp in assigned_employees
-            if (int(frappe.get_value("Employee", emp, "custom_notification_threshold_checkin") or 0) == start_time) or not has_valid_log_for_today(in_log="IN", emp=emp)
+            if (start_time-1 <= int(frappe.get_value("Employee", emp, "custom_notification_threshold_checkin") or 15) <= start_time+1) and not has_valid_log_for_today(in_log="IN", emp=emp)
         ]
-    else:
+    elif end_time:
         assigned_employees = [
             emp for emp in assigned_employees
-            if (int(frappe.get_value("Employee", emp,
-                                     "custom_notification_threshold_checkout") or 0) == end_time) or not has_valid_log_for_today(
+            if (end_time-1 <= int(frappe.get_value("Employee", emp,
+                                     "custom_notification_threshold_checkout") or 15) <= end_time+1) and not has_valid_log_for_today(
                 in_log="OUT", emp=emp)
         ]
     return list(set(assigned_employees) - set(inactive_employees))
 
 
-
 def has_valid_log_for_today(in_log=None, out_log=None, emp=None):
     today = datetime.today()
     log_type = in_log if in_log else out_log
-    query = query = "SELECT COUNT(log_type) FROM `tabEmployee Checkin` WHERE CAST(time as DATE)='%s' AND log_type='%s' AND employee = '%s'" % (today.strftime("%Y-%m-%d"), log_type, emp)
+    query = query = "SELECT log_type FROM `tabEmployee Checkin` WHERE CAST(time as DATE)='%s' AND log_type='%s' AND employee = '%s'" % (today.strftime("%Y-%m-%d"), log_type, emp)
     valid_log = frappe.db.sql(query)
     return True if valid_log else False
 
@@ -382,6 +377,8 @@ def notify_employees_to_checkin_or_checkout():
     # Execute the query with the formatted time strings
     shifts = frappe.db.sql(query, (two_hours_back, now, two_hours_back, now), as_dict=True)
     for shift in shifts:
+        notify_checkin = []
+        notify_checkout = []
         time_difference_in = get_time_difference(now, shift.start_time)
         time_difference_out = get_time_difference(now, shift.end_time)
         employees_closer_to_checkin = get_assigned_employees_with_specified_threshold(shift.name,

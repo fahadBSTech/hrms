@@ -250,8 +250,8 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
                         in_time = in_log.time
                 elif not out_log:
                     out_log = log if log.log_type == "OUT" else None
-            out_log = in_log.shift_end if (in_log and not out_log) else out_log
-            print(in_log.time, get_datetime(out_log.time), in_log.shift_end)
+            out_log = in_log.shift_end if (in_log and not out_log) else out_log.time
+            print(type(in_log.time), type(out_log))
             if in_log and out_log:
                 total_hours += time_diff_in_hours(in_log.time, out_log)
 
