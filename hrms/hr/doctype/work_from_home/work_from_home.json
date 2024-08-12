@@ -75,7 +75,8 @@
    "fetch_from": "employee.wfh_approver_name",
    "fieldname": "approver",
    "fieldtype": "Data",
-   "label": "Approval Name"
+   "label": "Approval Name",
+   "read_only": 1
   },
   {
    "fieldname": "section_whf_1",
@@ -114,27 +115,30 @@
    "fetch_from": "team_lead_id.full_name",
    "fieldname": "lead_name",
    "fieldtype": "Data",
-   "label": "Team Lead Name"
+   "label": "Team Lead Name",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.wfh_approver",
    "fieldname": "approver_id",
    "fieldtype": "Link",
    "label": "Approver",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.team_lead",
    "fieldname": "team_lead_id",
    "fieldtype": "Link",
    "label": "Team Lead",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-08-18 17:06:00.207682",
+ "modified": "2023-11-17 12:52:34.975508",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Work From Home",
