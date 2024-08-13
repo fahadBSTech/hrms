@@ -1,7 +1,7 @@
 import frappe
 from frappe.utils import getdate, add_days, get_first_day, get_last_day, nowdate
 from datetime import datetime
-
+from frappe import _
 
 def is_holiday(holiday_list, date):
 	if not holiday_list:
@@ -94,3 +94,39 @@ def get_holiday_dates_between(
 		query = query.where(Holiday.weekly_off == 0)
 
 	return query.run(pluck=True)
+
+
+@frappe.whitelist()
+def get_leave_summary(start_date, end_date):
+    # Get the current logged-in user
+    current_user = frappe.session.user
+    
+    # Get the employee record linked to the logged-in user
+    employee = frappe.get_value("Employee", {"user_id": current_user}, "name")
+    
+    if not employee:
+        frappe.throw(_("No Employee record found for the current user."))
+    
+    # Calculate the total allocated leaves for the employee within the given date range
+    total_allocated_leaves = frappe.db.sql("""
+        SELECT SUM(total_leaves_allocated)
+        FROM `tabLeave Allocation`
+        WHERE employee = %s AND from_date >= %s AND to_date <= %s AND docstatus = 1
+    """, (employee, start_date, end_date))[0][0] or 0
+
+    # Calculate the total availed leaves (approved leave applications) within the given date range
+    availed_leaves = frappe.db.sql("""
+        SELECT SUM(total_leave_days)
+        FROM `tabLeave Application`
+        WHERE employee = %s AND status = 'Approved' AND from_date >= %s AND to_date <= %s AND docstatus = 1
+    """, (employee, start_date, end_date))[0][0] or 0
+
+    # Calculate the remaining balance of leaves
+    remaining_leaves = total_allocated_leaves - availed_leaves
+    
+    # Return the result as a JSON response
+    return {
+        "total_allocated_leaves": total_allocated_leaves,
+        "availed_leaves": availed_leaves,
+        "remaining_leaves": remaining_leaves
+    }
