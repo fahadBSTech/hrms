@@ -63,26 +63,29 @@
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Time",
-   "permlevel": 1,
    "reqd": 1
   },
   {
    "fieldname": "device_id",
    "fieldtype": "Data",
-   "label": "Location / Device ID"
+   "hidden": 1,
+   "label": "Location / Device ID",
+   "permlevel": 1
   },
   {
    "default": "0",
    "fieldname": "skip_auto_attendance",
    "fieldtype": "Check",
-   "label": "Skip Auto Attendance"
+   "hidden": 1,
+   "label": "Skip Auto Attendance",
+   "permlevel": 1
   },
   {
    "fieldname": "attendance",
    "fieldtype": "Link",
    "label": "Attendance Marked",
    "options": "Attendance",
-   "read_only": 1
+   "permlevel": 1
   },
   {
    "fieldname": "shift_start",
@@ -110,7 +113,7 @@
   }
  ],
  "links": [],
- "modified": "2024-04-02 01:50:23.150627",
+ "modified": "2024-08-21 12:17:00.595184",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
@@ -205,6 +208,7 @@
    "role": "Employee"
   }
  ],
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "ASC",
  "states": [],
