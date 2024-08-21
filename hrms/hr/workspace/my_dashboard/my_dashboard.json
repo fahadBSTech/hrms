@@ -112,7 +112,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-07-11 14:51:25.145197",
+ "modified": "2024-08-20 18:11:10.667923",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "My Dashboard",
@@ -123,11 +123,19 @@
   },
   {
    "label": "Leaves Taken",
-   "number_card_name": "Leave Taken"
+   "number_card_name": "Total Availed Leaves"
+  },
+  {
+   "label": "Leaves Remainig",
+   "number_card_name": "Total Remaining Leaves"
   },
   {
    "label": "Total Present (This Month)",
    "number_card_name": "Total Present (This Month)"
+  },
+  {
+   "label": "Allocated Leaves",
+   "number_card_name": "Total Allocated Leaves"
   },
   {
    "label": "Allowed",
@@ -136,14 +144,6 @@
   {
    "label": "Late Entries (This Month)",
    "number_card_name": "Late Entry (This Month)"
-  },
-  {
-   "label": "Allocated Leaves",
-   "number_card_name": "Allocated Leaves"
-  },
-  {
-   "label": "Leaves Remainig",
-   "number_card_name": "Remaining Leaves"
   },
   {
    "label": "Availed",
@@ -156,10 +156,6 @@
   {
    "label": "Remaining Balance",
    "number_card_name": "Medical Remaining Balance"
-  },
-  {
-   "label": "Total WFH (This Month)",
-   "number_card_name": "Total WFH-2"
   }
  ],
  "owner": "wajahat+admin@bitsol.tech",
