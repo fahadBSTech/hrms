@@ -162,7 +162,7 @@ class ShiftType(Document):
 
             if shift_details and shift_details.shift_type.name == self.name:
                 attendance = mark_attendance(employee, date, "Absent", self.name)
-
+                print("Attendance: ", attendance)
                 if not attendance:
                     continue
 
