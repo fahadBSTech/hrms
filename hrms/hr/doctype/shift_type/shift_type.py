@@ -159,7 +159,7 @@ class ShiftType(Document):
         for date in dates:
             timestamp = datetime.combine(date, start_time)
             shift_details = get_employee_shift(employee, timestamp, True)
-
+            print("Shift Assigned", shift_details)
             if shift_details and shift_details.shift_type.name == self.name:
                 attendance = mark_attendance(employee, date, "Absent", self.name)
                 print("Attendance: ", attendance)
