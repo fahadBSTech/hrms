@@ -155,7 +155,7 @@ class ShiftType(Document):
         """
         start_time = get_time(self.start_time)
         dates = self.get_dates_for_attendance(employee)
-
+        print(f"Date: {dates}")
         for date in dates:
             timestamp = datetime.combine(date, start_time)
             shift_details = get_employee_shift(employee, timestamp, True)
