@@ -46,7 +46,7 @@ class ShiftType(Document):
             single_shift_logs = list(group)
             attendance_date = key[1].date()
             employee = key[0]
-            logger.info(f"EMployee: {employee}")
+            print(f"EMployee: {employee}----{single_shift_logs}")
             if not self.should_mark_attendance(employee, attendance_date):
                 continue
 
@@ -58,7 +58,7 @@ class ShiftType(Document):
                 in_time,
                 out_time,
             ) = self.get_attendance(single_shift_logs)
-            logger.info(attendance_status, working_hours, late_entry, early_exit, in_time, out_time)
+            print(attendance_status, working_hours, late_entry, early_exit, in_time, out_time)
             mark_attendance_and_link_log(
                 single_shift_logs,
                 attendance_status,
@@ -75,12 +75,12 @@ class ShiftType(Document):
         frappe.db.commit()  # nosemgrep
 
         assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
-        logger.info(f"assigned employees: {assigned_employees}")
+        print(f"assigned employees: {assigned_employees}")
         # mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
         # right from "Process Attendance After" to "Last Sync of Checkin"
         for batch in create_batch(assigned_employees, EMPLOYEE_CHUNK_SIZE):
             for employee in batch:
-                logger.info(f"Employee with no attendance {employee}")
+                print(f"Employee with no attendance {employee}")
                 self.mark_absent_for_dates_with_no_attendance(employee)
 
             frappe.db.commit()  # nosemgrep
