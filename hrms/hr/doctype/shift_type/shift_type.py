@@ -41,15 +41,12 @@ class ShiftType(Document):
             return
 
         logs = self.get_employee_checkins()
-        print("Logs: ", logs)
         for key, group in itertools.groupby(logs, key=lambda x: (x["employee"], x["shift_start"])):
             single_shift_logs = list(group)
             attendance_date = key[1].date()
             employee = key[0]
-            print(f"EMployee: {employee}----{single_shift_logs}")
             if not self.should_mark_attendance(employee, attendance_date):
                 continue
-
             (
                 attendance_status,
                 working_hours,
@@ -58,7 +55,6 @@ class ShiftType(Document):
                 in_time,
                 out_time,
             ) = self.get_attendance(single_shift_logs)
-            print(attendance_status, working_hours, late_entry, early_exit, in_time, out_time)
             mark_attendance_and_link_log(
                 single_shift_logs,
                 attendance_status,
@@ -75,12 +71,11 @@ class ShiftType(Document):
         frappe.db.commit()  # nosemgrep
 
         assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
-        print(f"assigned employees: {assigned_employees}")
         # mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
         # right from "Process Attendance After" to "Last Sync of Checkin"
         for batch in create_batch(assigned_employees, EMPLOYEE_CHUNK_SIZE):
             for employee in batch:
-                print(f"Employee with no attendance {employee}")
+                logger.info(f"Employee with no attendance {employee}")
                 self.mark_absent_for_dates_with_no_attendance(employee)
 
             frappe.db.commit()  # nosemgrep
@@ -155,7 +150,6 @@ class ShiftType(Document):
         """
         start_time = get_time(self.start_time)
         dates = self.get_dates_for_attendance(employee)
-        print(f"Date: {dates}")
         for date in dates:
             timestamp = datetime.combine(date, start_time)
             shift_details = get_employee_shift(employee, timestamp, True)
@@ -296,7 +290,7 @@ class ShiftType(Document):
 def process_auto_attendance_for_all_shifts():
     shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
     for shift in shift_list:
-        print(f"Shift Name: {shift}")
+        logger.info(f"Shift Name: {shift}")
         doc = frappe.get_cached_doc("Shift Type", shift)
         doc.process_auto_attendance()
 
@@ -337,7 +331,7 @@ def get_time_difference(obj1, obj2):
 
 
 
-def  get_assigned_employees_with_specified_threshold(name, from_date=None,
+def get_assigned_employees_with_specified_threshold(name, from_date=None,
                                                     start_time=None, end_time=None) -> list[str]:
     filters = {"shift_type": name, "docstatus": "1", "status": "Active"}
     if from_date:
@@ -373,6 +367,8 @@ def has_valid_log_for_today(in_log=None, out_log=None, emp=None):
 
 
 def notify_employees_to_checkin_or_checkout():
+    frappe.utils.logger.set_log_level("DEBUG")
+    notification_logger = frappe.logger("reminder_notifications", allow_site=True, file_count=10)
     notify_checkin = notify_checkout = []
     now = frappe.utils.now_datetime()
     two_hours_back = frappe.utils.add_to_date(now, hours=-2)
@@ -385,10 +381,9 @@ def notify_employees_to_checkin_or_checkout():
     # Execute the query with the formatted time strings
     shifts = frappe.db.sql(query, (two_hours_back, now, two_hours_back, now), as_dict=True)
     for shift in shifts:
-        print("Shift------", shift.name)
-        print("Holiday List", shift.holiday_list, frappe.utils.getdate(now))
+        notification_logger.info(f"Shift Name: {shift.name}")
         if is_holiday(shift.holiday_list, frappe.utils.getdate(now)):
-            print("Skipped: holiday found")
+            notification_logger.info("Skipped: holiday found")
             continue
         notify_checkin = []
         notify_checkout = []
@@ -406,6 +401,8 @@ def notify_employees_to_checkin_or_checkout():
             employee = frappe.get_doc('Employee', emp)
             if employee.custom_fcm_token:
                 notify_checkout.append(employee.custom_fcm_token)
+        notification_logger.info(f"Employees to be notified for Check In: {notify_checkin}")
+        notification_logger.info(f"Employees to be notified for Check Out: {notify_checkout}")
         if notify_checkin:
             send_push_notification(notify_checkin, log="in")
         if notify_checkout:
