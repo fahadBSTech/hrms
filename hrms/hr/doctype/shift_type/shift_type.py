@@ -46,7 +46,7 @@ class ShiftType(Document):
             single_shift_logs = list(group)
             attendance_date = key[1].date()
             employee = key[0]
-            logger.info("EMployee: ", employee)
+            logger.info(f"EMployee: {employee}")
             if not self.should_mark_attendance(employee, attendance_date):
                 continue
 
@@ -295,7 +295,7 @@ class ShiftType(Document):
 def process_auto_attendance_for_all_shifts():
     shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
     for shift in shift_list:
-        logger.info("Shift Name: ", shift)
+        logger.info(f"Shift Name: {shift}")
         doc = frappe.get_cached_doc("Shift Type", shift)
         doc.process_auto_attendance()
 
