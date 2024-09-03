@@ -13,6 +13,9 @@ def is_holiday(holiday_list, date):
 
 	return bool(holidays)
 
+
+
+
 @frappe.whitelist()
 def get_current_month_working_days(company, start_date, end_date):
     user = frappe.session.user
@@ -35,28 +38,19 @@ def get_current_month_working_days(company, start_date, end_date):
             total_working_days_count += 1
         current_date = add_days(current_date, 1)
 
-    leaves = frappe.get_all('Leave Application',
-                            filters={
-                                'employee': employee,
-                                'status': 'Approved',
-                                'from_date': ('<=', today),
-                                'to_date': ('>=', start_date)
-                            },
-                            fields=['from_date', 'to_date', 'half_day'])
-
+    leaves = frappe.db.get_all('Attendance',
+                                         filters={
+                                             'employee': employee,
+                                             'status': ['in', ['On Leave', 'Half Day']],
+                                             'attendance_date': ['between', [start_date, end_date]]
+                                         }, 
+fields=['name', 'employee', 'status', 'attendance_date'])
     leave_days_count = 0
     for leave in leaves:
-        leave_start = getdate(leave['from_date'])
-        leave_end = getdate(leave['to_date'])
-        current_leave_date = leave_start
-
-        while current_leave_date <= leave_end:
-            if start_date <= current_leave_date <= today:
-                if leave['half_day']:
-                    leave_days_count += 0.5
-                else:
-                    leave_days_count += 1
-            current_leave_date = add_days(current_leave_date, 1)
+        if leave["status"] == "Half Day":
+            leave_days_count += 0.5
+        else:
+            leave_days_count += 1
 
     working_days_till_today = 0
     current_date = start_date
@@ -68,7 +62,7 @@ def get_current_month_working_days(company, start_date, end_date):
         current_date = add_days(current_date, 1)
 
     actual_working_days_count = working_days_till_today - leave_days_count
-
+    total_working_days_count -= leave_days_count
     return {
         'total_working_days': total_working_days_count,
         'off_days': leave_days_count,

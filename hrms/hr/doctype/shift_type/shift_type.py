@@ -289,12 +289,14 @@ class ShiftType(Document):
 			return False
 		return True
 
+
 def process_auto_attendance_for_all_shifts():
     shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
     for shift in shift_list:
-        print("Shift Type:", shift)
         doc = frappe.get_cached_doc("Shift Type", shift)
         doc.process_auto_attendance()
+
+
 
 def get_month_start_end_dates_with_time(year = datetime.now().year, month = datetime.now().month):
     # Create a datetime object for the first day of the month with time 00:00:00
@@ -365,12 +367,13 @@ def has_valid_log_for_today(in_log=None, out_log=None, emp=None):
     return True if valid_log else False
 
 
+
 def notify_employees_to_checkin_or_checkout():
     notify_checkin = notify_checkout = []
     now = frappe.utils.now_datetime()
     two_hours_back = frappe.utils.add_to_date(now, hours=-2)
     query = """
-            SELECT start_time, end_time, name
+            SELECT start_time, end_time, name, holiday_list
             FROM `tabShift Type`
             WHERE (start_time BETWEEN %s AND %s) OR (end_time BETWEEN %s AND %s)
         """
@@ -378,6 +381,11 @@ def notify_employees_to_checkin_or_checkout():
     # Execute the query with the formatted time strings
     shifts = frappe.db.sql(query, (two_hours_back, now, two_hours_back, now), as_dict=True)
     for shift in shifts:
+        print("Shift------", shift.name)
+        print("Holiday List", shift.holiday_list, frappe.utils.getdate(now))
+        if is_holiday(shift.holiday_list, frappe.utils.getdate(now)):
+            print("Skipped: holiday found")
+            continue
         notify_checkin = []
         notify_checkout = []
         time_difference_in = get_time_difference(now, shift.start_time)
@@ -386,13 +394,14 @@ def notify_employees_to_checkin_or_checkout():
                                                                                       start_time=time_difference_in)
         for emp in employees_closer_to_checkin:
             employee = frappe.get_doc('Employee', emp)
-            notify_checkin.append(employee.custom_fcm_token)
+            if employee.custom_fcm_token:
+                notify_checkin.append(employee.custom_fcm_token)
         employees_closer_to_checkout = get_assigned_employees_with_specified_threshold(shift.name,
                                                                                              end_time=time_difference_out)
         for emp in employees_closer_to_checkout:
             employee = frappe.get_doc('Employee', emp)
-            notify_checkout.append(employee.custom_fcm_token)
-
+            if employee.custom_fcm_token:
+                notify_checkout.append(employee.custom_fcm_token)
         if notify_checkin:
             send_push_notification(notify_checkin, log="in")
         if notify_checkout:
