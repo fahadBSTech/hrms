@@ -75,11 +75,12 @@ class ShiftType(Document):
         frappe.db.commit()  # nosemgrep
 
         assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
-
+        logger.info(f"assigned employees: {assigned_employees}")
         # mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
         # right from "Process Attendance After" to "Last Sync of Checkin"
         for batch in create_batch(assigned_employees, EMPLOYEE_CHUNK_SIZE):
             for employee in batch:
+                logger.info(f"Employee with no attendance {employee}")
                 self.mark_absent_for_dates_with_no_attendance(employee)
 
             frappe.db.commit()  # nosemgrep
