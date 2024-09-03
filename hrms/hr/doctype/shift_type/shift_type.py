@@ -25,13 +25,11 @@ from hrms.utils.send_notification import send_push_notification
 
 EMPLOYEE_CHUNK_SIZE = 50
 
-
+frappe.utils.logger.set_log_level("DEBUG")
+logger = frappe.logger("attendance_test", allow_site=True, file_count=10)
 class ShiftType(Document):
     @frappe.whitelist()
     def process_auto_attendance(self):
-
-        frappe.utils.logger.set_log_level("DEBUG")
-        logger = frappe.logger("attendance_test", allow_site=True, file_count=10)
         start_date_time, end_date_time = get_month_start_end_dates_with_time()
         self.process_attendance_after = start_date_time
         self.last_sync_of_checkin = end_date_time
@@ -43,7 +41,7 @@ class ShiftType(Document):
             return
 
         logs = self.get_employee_checkins()
-
+        logger.info(logs)
         for key, group in itertools.groupby(logs, key=lambda x: (x["employee"], x["shift_start"])):
             single_shift_logs = list(group)
             attendance_date = key[1].date()
@@ -297,6 +295,7 @@ class ShiftType(Document):
 def process_auto_attendance_for_all_shifts():
     shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
     for shift in shift_list:
+        logger.info("Shift Name: ", shift)
         doc = frappe.get_cached_doc("Shift Type", shift)
         doc.process_auto_attendance()
 
