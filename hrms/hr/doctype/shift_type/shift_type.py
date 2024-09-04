@@ -76,7 +76,7 @@ class ShiftType(Document):
 		# commit after processing checkin logs to avoid losing progress
 		frappe.db.commit()  # nosemgrep
 
-		assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
+		assigned_employees = self.get_assigned_employees(None, True)
 
 		# mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
 		# right from "Process Attendance After" to "Last Sync of Checkin"
@@ -159,6 +159,7 @@ class ShiftType(Document):
 
 		for date in dates:
 			timestamp = datetime.combine(date, start_time)
+			logger.info(f"Getting employee {employee} shift having timestamp {timestamp}")
 			shift_details = get_employee_shift(employee, timestamp, True)
 			if shift_details and shift_details.shift_type.name == self.name:
 				logger.info(f"Shift Assigned {shift_details} and employee {employee}")
