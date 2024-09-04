@@ -31,7 +31,7 @@ class ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self):
 		start_date_time, end_date_time = get_month_start_end_dates_with_time()
-        logger.info(f"Start Time: {start_date_time}, End Time: {end_date_time}")
+		logger.info(f"Start Time: {start_date_time}, End Time: {end_date_time}")
 		self.process_attendance_after = start_date_time
 		self.last_sync_of_checkin = end_date_time
 		if (
@@ -39,7 +39,7 @@ class ShiftType(Document):
 			or not self.process_attendance_after
 			or not self.last_sync_of_checkin
 		):
-            logger.info(f"Skipping Shift due to; Auto-Attendance: {cint(self.enable_auto_attendance)}, Process Attendance After: {self.process_attendance_after}, Last Sync of Checkin: {self.last_sync_of_checkin}")
+			logger.info(f"Skipping Shift due to; Auto-Attendance: {cint(self.enable_auto_attendance)}, Process Attendance After: {self.process_attendance_after}, Last Sync of Checkin: {self.last_sync_of_checkin}")
 			return
 
 		logs = self.get_employee_checkins()
@@ -50,7 +50,7 @@ class ShiftType(Document):
 			employee = key[0]
 
 			if not self.should_mark_attendance(employee, attendance_date):
-                logger.info(f"Skipping Attendance due to holiday. {employee}-{attendance_date}")
+				logger.info(f"Skipping Attendance due to holiday. {employee}-{attendance_date}")
 				continue
 
 			(
@@ -161,10 +161,10 @@ class ShiftType(Document):
 			timestamp = datetime.combine(date, start_time)
 			shift_details = get_employee_shift(employee, timestamp, True)
 			if shift_details and shift_details.shift_type.name == self.name:
-                logger.info(f"Shift Assigned {shift_details} and employee {employee}")
-                logger.info(f"Going to mark attendance date: {date} as Absent due to no attendance")
+				logger.info(f"Shift Assigned {shift_details} and employee {employee}")
+				logger.info(f"Going to mark attendance date: {date} as Absent due to no attendance")
 				attendance = mark_attendance(employee, date, "Absent", self.name)
-                logger.info(f"Attendance marked: {attendance}")
+				logger.info(f"Attendance marked: {attendance}")
 				if not attendance:
 					continue
 
@@ -180,7 +180,7 @@ class ShiftType(Document):
 
 	def get_dates_for_attendance(self, employee: str) -> list[str]:
 		start_date, end_date = self.get_start_and_end_dates(employee)
-        logger.info(f"Employee: {employee}, Attendance Start Date: {start_date}, Attendance End Date: {end_date}")
+		logger.info(f"Employee: {employee}, Attendance Start Date: {start_date}, Attendance End Date: {end_date}")
 
 		# no shift assignment found, no need to process absent attendance records
 		if start_date is None:
@@ -403,3 +403,4 @@ def notify_employees_to_checkin_or_checkout():
             send_push_notification(notify_checkin, log="in")
         if notify_checkout:
             send_push_notification(notify_checkout, log="out")
+
