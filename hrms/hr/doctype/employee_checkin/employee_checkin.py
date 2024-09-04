@@ -198,7 +198,7 @@ def mark_attendance_and_link_log(
         shift=None,
 ):
     frappe.utils.logger.set_log_level("DEBUG")
-    logger = frappe.logger("attendance", allow_site=True, file_count=10)
+    logger = frappe.logger("attendance_for_checkins", allow_site=True, file_count=10)
 
     """Creates an attendance and links the attendance to the Employee Checkin.
     Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
