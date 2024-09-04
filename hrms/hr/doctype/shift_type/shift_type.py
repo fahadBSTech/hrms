@@ -14,8 +14,8 @@ from erpnext.setup.doctype.holiday_list.holiday_list import is_holiday
 
 from hrms.hr.doctype.attendance.attendance import mark_attendance
 from hrms.hr.doctype.employee_checkin.employee_checkin import (
-    calculate_working_hours,
-    mark_attendance_and_link_log,
+	calculate_working_hours,
+	mark_attendance_and_link_log,
 )
 from hrms.hr.doctype.shift_assignment.shift_assignment import get_employee_shift, get_shift_details
 from hrms.utils import get_date_range
@@ -26,59 +26,65 @@ from hrms.utils.send_notification import send_push_notification
 EMPLOYEE_CHUNK_SIZE = 50
 
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("attendance_test", allow_site=True, file_count=10)
+logger = frappe.logger("shift_type", allow_site=True, file_count=10)
 class ShiftType(Document):
-    @frappe.whitelist()
-    def process_auto_attendance(self):
-        start_date_time, end_date_time = get_month_start_end_dates_with_time()
-        self.process_attendance_after = start_date_time
-        self.last_sync_of_checkin = end_date_time
-        if (
-            not cint(self.enable_auto_attendance)
-            or not self.process_attendance_after
-            or not self.last_sync_of_checkin
-        ):
-            return
+	@frappe.whitelist()
+	def process_auto_attendance(self):
+		start_date_time, end_date_time = get_month_start_end_dates_with_time()
+        logger.info(f"Start Time: {start_date_time}, End Time: {end_date_time}")
+		self.process_attendance_after = start_date_time
+		self.last_sync_of_checkin = end_date_time
+		if (
+			not cint(self.enable_auto_attendance)
+			or not self.process_attendance_after
+			or not self.last_sync_of_checkin
+		):
+            logger.info(f"Skipping Shift due to; Auto-Attendance: {cint(self.enable_auto_attendance)}, Process Attendance After: {self.process_attendance_after}, Last Sync of Checkin: {self.last_sync_of_checkin}")
+			return
 
-        logs = self.get_employee_checkins()
-        for key, group in itertools.groupby(logs, key=lambda x: (x["employee"], x["shift_start"])):
-            single_shift_logs = list(group)
-            attendance_date = key[1].date()
-            employee = key[0]
-            if not self.should_mark_attendance(employee, attendance_date):
-                continue
-            (
-                attendance_status,
-                working_hours,
-                late_entry,
-                early_exit,
-                in_time,
-                out_time,
-            ) = self.get_attendance(single_shift_logs)
-            mark_attendance_and_link_log(
-                single_shift_logs,
-                attendance_status,
-                attendance_date,
-                working_hours,
-                late_entry,
-                early_exit,
-                in_time,
-                out_time,
-                self.name,
-            )
+		logs = self.get_employee_checkins()
 
-        # commit after processing checkin logs to avoid losing progress
-        frappe.db.commit()  # nosemgrep
+		for key, group in itertools.groupby(logs, key=lambda x: (x["employee"], x["shift_start"])):
+			single_shift_logs = list(group)
+			attendance_date = key[1].date()
+			employee = key[0]
 
-        assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
-        # mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
-        # right from "Process Attendance After" to "Last Sync of Checkin"
-        for batch in create_batch(assigned_employees, EMPLOYEE_CHUNK_SIZE):
-            for employee in batch:
-                logger.info(f"Employee with no attendance {employee}")
-                self.mark_absent_for_dates_with_no_attendance(employee)
+			if not self.should_mark_attendance(employee, attendance_date):
+                logger.info(f"Skipping Attendance due to holiday. {employee}-{attendance_date}")
+				continue
 
-            frappe.db.commit()  # nosemgrep
+			(
+				attendance_status,
+				working_hours,
+				late_entry,
+				early_exit,
+				in_time,
+				out_time,
+			) = self.get_attendance(single_shift_logs)
+			mark_attendance_and_link_log(
+				single_shift_logs,
+				attendance_status,
+				attendance_date,
+				working_hours,
+				late_entry,
+				early_exit,
+				in_time,
+				out_time,
+				self.name,
+			)
+
+		# commit after processing checkin logs to avoid losing progress
+		frappe.db.commit()  # nosemgrep
+
+		assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
+
+		# mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
+		# right from "Process Attendance After" to "Last Sync of Checkin"
+		for batch in create_batch(assigned_employees, EMPLOYEE_CHUNK_SIZE):
+			for employee in batch:
+				self.mark_absent_for_dates_with_no_attendance(employee)
+
+			frappe.db.commit()  # nosemgrep
 
     def get_employee_checkins(self) -> list[dict]:
         return frappe.get_all(
@@ -144,21 +150,23 @@ class ShiftType(Document):
 
         return "Present", total_working_hours, late_entry, early_exit, in_time, out_time
 
-    def mark_absent_for_dates_with_no_attendance(self, employee: str):
-        """Marks Absents for the given employee on working days in this shift that have no attendance marked.
-        The Absent status is marked starting from 'process_attendance_after' or employee creation date.
-        """
-        start_time = get_time(self.start_time)
-        dates = self.get_dates_for_attendance(employee)
-        for date in dates:
-            timestamp = datetime.combine(date, start_time)
-            shift_details = get_employee_shift(employee, timestamp, True)
-            print("Shift Assigned", shift_details)
-            if shift_details and shift_details.shift_type.name == self.name:
-                attendance = mark_attendance(employee, date, "Absent", self.name)
-                print("Attendance: ", attendance)
-                if not attendance:
-                    continue
+	def mark_absent_for_dates_with_no_attendance(self, employee: str):
+		"""Marks Absents for the given employee on working days in this shift that have no attendance marked.
+		The Absent status is marked starting from 'process_attendance_after' or employee creation date.
+		"""
+		start_time = get_time(self.start_time)
+		dates = self.get_dates_for_attendance(employee)
+
+		for date in dates:
+			timestamp = datetime.combine(date, start_time)
+			shift_details = get_employee_shift(employee, timestamp, True)
+			if shift_details and shift_details.shift_type.name == self.name:
+                logger.info(f"Shift Assigned {shift_details} and employee {employee}")
+                logger.info(f"Going to mark attendance date: {date} as Absent due to no attendance")
+				attendance = mark_attendance(employee, date, "Absent", self.name)
+                logger.info(f"Attendance marked: {attendance}")
+				if not attendance:
+					continue
 
                 frappe.get_doc(
                     {
@@ -170,12 +178,13 @@ class ShiftType(Document):
                     }
                 ).insert(ignore_permissions=True)
 
-    def get_dates_for_attendance(self, employee: str) -> list[str]:
-        start_date, end_date = self.get_start_and_end_dates(employee)
+	def get_dates_for_attendance(self, employee: str) -> list[str]:
+		start_date, end_date = self.get_start_and_end_dates(employee)
+        logger.info(f"Employee: {employee}, Attendance Start Date: {start_date}, Attendance End Date: {end_date}")
 
-        # no shift assignment found, no need to process absent attendance records
-        if start_date is None:
-            return []
+		# no shift assignment found, no need to process absent attendance records
+		if start_date is None:
+			return []
 
         date_range = get_date_range(start_date, end_date)
 
@@ -300,13 +309,13 @@ def get_month_start_end_dates_with_time(year = datetime.now().year, month = date
     # Create a datetime object for the first day of the month with time 00:00:00
     start_date = datetime(year, month, 1, 0, 0, 0)
 
-        # Create end datetime for the current day
+		# Create end datetime for the current day
     today = datetime.today()
     end_date = today.replace(hour=23, minute=59, second=0)
     end_date = datetime.fromisoformat(str(end_date))
     end_date = end_date.replace(microsecond=0)
 
-        # TODO: save for future use
+		# TODO: save for future use
     # Calculate the last day of the month by going to the next month's first day and subtracting one second
     # if month == 12:
     #     end_date = datetime(

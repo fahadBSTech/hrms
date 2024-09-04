@@ -15,8 +15,6 @@ from hrms.hr.utils import validate_active_employee
 from datetime import datetime
 
 
-
-
 class EmployeeCheckin(Document):
     def validate(self):
         validate_active_employee(self.employee)
@@ -132,8 +130,6 @@ class EmployeeCheckin(Document):
             self.shift = None
 
 
-
-
 @frappe.whitelist()
 def add_log_based_on_employee_field(
 	employee_field_value,
@@ -184,8 +180,6 @@ def add_log_based_on_employee_field(
 	return doc
 
 
-
-
 def mark_attendance_and_link_log(
         logs,
         attendance_status,
@@ -198,10 +192,10 @@ def mark_attendance_and_link_log(
         shift=None,
 ):
     frappe.utils.logger.set_log_level("DEBUG")
-    logger = frappe.logger("attendance_for_checkins", allow_site=True, file_count=10)
+    logger = frappe.logger("checkin", allow_site=True, file_count=10)
 
-    """Creates an attendance and links the attendance to the Employee Checkin.
-    Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
+	"""Creates an attendance and links the attendance to the Employee Checkin.
+	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
     :param logs: The List of 'Employee Checkin'.
     :param attendance_status: Attendance status to be marked. One of: (Present, Absent, Half Day, Skip). Note: 'On Leave' is not supported by this function.
@@ -211,42 +205,46 @@ def mark_attendance_and_link_log(
     log_names = [x.name for x in logs]
     employee = logs[0].employee
 
-    if attendance_status == "Skip":
-        skip_attendance_in_checkins(log_names)
-        return None
+	if attendance_status == "Skip":
+		skip_attendance_in_checkins(log_names)
+        logger.info("Attendance skipped due to attendance_status")
+		return None
 
-    elif attendance_status in ("Present", "Absent", "Half Day"):
-        try:
-            frappe.db.savepoint("attendance_creation")
-            attendance = frappe.new_doc("Attendance")
-            attendance.update(
-                {
-                    "doctype": "Attendance",
-                    "employee": employee,
-                    "attendance_date": attendance_date,
-                    "status": attendance_status,
-                    "working_hours": working_hours,
-                    "shift": shift,
-                    "late_entry": late_entry,
-                    "early_exit": early_exit,
-                    "in_time": in_time,
-                    "out_time": out_time,
-                }
-            ).submit()
-            if attendance_status == "Absent":
-                attendance.add_comment(
-                    text=_("Employee was marked Absent for not meeting the working hours threshold.")
-                )
+	elif attendance_status in ("Present", "Absent", "Half Day"):
+		try:
+			frappe.db.savepoint("attendance_creation")
+			attendance = frappe.new_doc("Attendance")
+			attendance.update(
+				{
+					"doctype": "Attendance",
+					"employee": employee,
+					"attendance_date": attendance_date,
+					"status": attendance_status,
+					"working_hours": working_hours,
+					"shift": shift,
+					"late_entry": late_entry,
+					"early_exit": early_exit,
+					"in_time": in_time,
+					"out_time": out_time,
+				}
+			).submit()
+
+			if attendance_status == "Absent":
+				attendance.add_comment(
+					text=_("Employee was marked Absent for not meeting the working hours threshold.")
+				)
             message = "{0} marked for {1} in shift {2}. Time for checkin is {3} and checkout is {4} and total working hours are {5}".format(attendance_status, employee, shift.name, in_time, out_time, working_hours)
             logger.info(message)
-            update_attendance_in_checkins(log_names, attendance.name)
-            return attendance
+            logger.info(f"date: {attendance_date}, late_entry: {late_entry}, early_exit: {early_exit}")
+			update_attendance_in_checkins(log_names, attendance.name)
+			return attendance
 
-        except frappe.ValidationError as e:
-            handle_attendance_exception(log_names, e)
+		except frappe.ValidationError as e:
+			handle_attendance_exception(log_names, e)
 
-    else:
-        frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
+	else:
+		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
+
 
 
 
