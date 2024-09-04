@@ -148,6 +148,9 @@ def mark_attendance_and_link_log(
 	out_time=None,
 	shift=None,
 ):
+    frappe.utils.logger.set_log_level("DEBUG")
+    logger = frappe.logger("checkin", allow_site=True, file_count=10)
+
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
@@ -161,6 +164,7 @@ def mark_attendance_and_link_log(
 
 	if attendance_status == "Skip":
 		skip_attendance_in_checkins(log_names)
+        logger.info("Attendance skipped due to attendance_status")
 		return None
 
 	elif attendance_status in ("Present", "Absent", "Half Day"):
@@ -186,7 +190,9 @@ def mark_attendance_and_link_log(
 				attendance.add_comment(
 					text=_("Employee was marked Absent for not meeting the working hours threshold.")
 				)
-
+            message = "{0} marked for {1} in shift {2}. Time for checkin is {3} and checkout is {4} and total working hours are {5}".format(attendance_status, employee, shift.name, in_time, out_time, working_hours)
+            logger.info(message)
+            logger.info(f"date: {attendance_date}, late_entry: {late_entry}, early_exit: {early_exit}")
 			update_attendance_in_checkins(log_names, attendance.name)
 			return attendance
 
