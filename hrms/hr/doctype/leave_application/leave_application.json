@@ -40,12 +40,13 @@
  ],
  "fields": [
   {
+   "default": "HR-LAP-.YYYY.-",
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "options": "HR-LAP-.YYYY.-",
-   "print_hide": 1,
    "reqd": 1,
    "set_only_once": 1
   },
@@ -146,7 +147,8 @@
   {
    "fieldname": "description",
    "fieldtype": "Small Text",
-   "label": "Reason"
+   "label": "Reason",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_7",
@@ -157,7 +159,8 @@
    "fieldname": "leave_approver",
    "fieldtype": "Link",
    "label": "Leave Approver",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fieldname": "leave_approver_name",
@@ -186,6 +189,7 @@
    "fieldtype": "Date",
    "label": "Posting Date",
    "no_copy": 1,
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -255,7 +259,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-04-08 13:56:03.818019",
+ "modified": "2024-08-20 10:27:01.178323",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

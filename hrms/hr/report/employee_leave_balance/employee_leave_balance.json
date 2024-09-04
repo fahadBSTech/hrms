@@ -1,5 +1,5 @@
 {
- "add_total_row": 1,
+ "add_total_row": 0,
  "columns": [],
  "creation": "2013-02-22 15:29:34",
  "disable_prepared_report": 0,
@@ -10,7 +10,7 @@
  "idx": 3,
  "is_standard": "Yes",
  "json": "{}",
- "modified": "2024-07-03 17:58:15.532854",
+ "modified": "2024-08-21 12:58:49.182212",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Leave Balance",
@@ -18,7 +18,7 @@
  "prepared_report": 1,
  "ref_doctype": "Employee",
  "report_name": "Employee Leave Balance",
- "report_type": "Report Builder",
+ "report_type": "Script Report",
  "roles": [
   {
    "role": "HR User"

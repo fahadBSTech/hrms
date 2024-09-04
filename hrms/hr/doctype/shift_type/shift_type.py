@@ -20,16 +20,18 @@ from hrms.hr.doctype.employee_checkin.employee_checkin import (
 from hrms.hr.doctype.shift_assignment.shift_assignment import get_employee_shift, get_shift_details
 from hrms.utils import get_date_range
 from hrms.utils.holiday_list import get_holiday_dates_between
-from hrms.utils.send_notification import send_push_notification 
+from hrms.utils.send_notification import send_push_notification
 
 
 EMPLOYEE_CHUNK_SIZE = 50
 
-
+frappe.utils.logger.set_log_level("DEBUG")
+logger = frappe.logger("shift_type", allow_site=True, file_count=10)
 class ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self):
 		start_date_time, end_date_time = get_month_start_end_dates_with_time()
+		logger.info(f"Start Time: {start_date_time}, End Time: {end_date_time}")
 		self.process_attendance_after = start_date_time
 		self.last_sync_of_checkin = end_date_time
 		if (
@@ -37,6 +39,7 @@ class ShiftType(Document):
 			or not self.process_attendance_after
 			or not self.last_sync_of_checkin
 		):
+			logger.info(f"Skipping Shift due to; Auto-Attendance: {cint(self.enable_auto_attendance)}, Process Attendance After: {self.process_attendance_after}, Last Sync of Checkin: {self.last_sync_of_checkin}")
 			return
 
 		logs = self.get_employee_checkins()
@@ -47,6 +50,7 @@ class ShiftType(Document):
 			employee = key[0]
 
 			if not self.should_mark_attendance(employee, attendance_date):
+				logger.info(f"Skipping Attendance due to holiday. {employee}-{attendance_date}")
 				continue
 
 			(
@@ -72,7 +76,7 @@ class ShiftType(Document):
 		# commit after processing checkin logs to avoid losing progress
 		frappe.db.commit()  # nosemgrep
 
-		assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
+		assigned_employees = self.get_assigned_employees(None, True)
 
 		# mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
 		# right from "Process Attendance After" to "Last Sync of Checkin"
@@ -155,11 +159,13 @@ class ShiftType(Document):
 
 		for date in dates:
 			timestamp = datetime.combine(date, start_time)
+			logger.info(f"Getting employee {employee} shift having timestamp {timestamp}")
 			shift_details = get_employee_shift(employee, timestamp, True)
-
 			if shift_details and shift_details.shift_type.name == self.name:
+				logger.info(f"Shift Assigned {shift_details} and employee {employee}")
+				logger.info(f"Going to mark attendance date: {date} as Absent due to no attendance")
 				attendance = mark_attendance(employee, date, "Absent", self.name)
-
+				logger.info(f"Attendance marked: {attendance}")
 				if not attendance:
 					continue
 
@@ -175,6 +181,7 @@ class ShiftType(Document):
 
 	def get_dates_for_attendance(self, employee: str) -> list[str]:
 		start_date, end_date = self.get_start_and_end_dates(employee)
+		logger.info(f"Employee: {employee}, Attendance Start Date: {start_date}, Attendance End Date: {end_date}")
 
 		# no shift assignment found, no need to process absent attendance records
 		if start_date is None:
@@ -292,13 +299,14 @@ class ShiftType(Document):
 def process_auto_attendance_for_all_shifts():
     shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
     for shift in shift_list:
+        logger.info(f"Shift Name: {shift}")
         doc = frappe.get_cached_doc("Shift Type", shift)
         doc.process_auto_attendance()
 
 def get_month_start_end_dates_with_time(year = datetime.now().year, month = datetime.now().month):
     # Create a datetime object for the first day of the month with time 00:00:00
     start_date = datetime(year, month, 1, 0, 0, 0)
-    
+
 		# Create end datetime for the current day
     today = datetime.today()
     end_date = today.replace(hour=23, minute=59, second=0)
@@ -396,3 +404,4 @@ def notify_employees_to_checkin_or_checkout():
             send_push_notification(notify_checkin, log="in")
         if notify_checkout:
             send_push_notification(notify_checkout, log="out")
+
