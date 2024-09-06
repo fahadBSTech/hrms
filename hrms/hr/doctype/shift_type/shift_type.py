@@ -2,8 +2,8 @@
 # For license information, please see license.txt
 
 
-import itertools
 from datetime import datetime, timedelta
+from itertools import groupby
 
 import frappe
 from frappe.model.document import Document
@@ -30,10 +30,6 @@ logger = frappe.logger("shift_type", allow_site=True, file_count=10)
 class ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self):
-		start_date_time, end_date_time = get_month_start_end_dates_with_time()
-		logger.info(f"Start Time: {start_date_time}, End Time: {end_date_time}")
-		self.process_attendance_after = start_date_time
-		self.last_sync_of_checkin = end_date_time
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -44,7 +40,8 @@ class ShiftType(Document):
 
 		logs = self.get_employee_checkins()
 
-		for key, group in itertools.groupby(logs, key=lambda x: (x["employee"], x["shift_start"])):
+		group_key = lambda x: (x["employee"], x["shift_start"])  # noqa
+		for key, group in groupby(sorted(logs, key=group_key), key=group_key):
 			single_shift_logs = list(group)
 			attendance_date = key[1].date()
 			employee = key[0]
@@ -76,7 +73,7 @@ class ShiftType(Document):
 		# commit after processing checkin logs to avoid losing progress
 		frappe.db.commit()  # nosemgrep
 
-		assigned_employees = self.get_assigned_employees(None, True)
+		assigned_employees = self.get_assigned_employees(self.process_attendance_after, True)
 
 		# mark absent in batches & commit to avoid losing progress since this tries to process remaining attendance
 		# right from "Process Attendance After" to "Last Sync of Checkin"
@@ -104,8 +101,8 @@ class ShiftType(Document):
 			filters={
 				"skip_auto_attendance": 0,
 				"attendance": ("is", "not set"),
-				"time": [">=", self.process_attendance_after],
-				"time": ["<=", self.last_sync_of_checkin],
+				"time": (">=", self.process_attendance_after),
+				"shift_actual_end": ("<", self.last_sync_of_checkin),
 				"shift": self.name,
 			},
 			order_by="employee,time",
@@ -156,10 +153,11 @@ class ShiftType(Document):
 		"""
 		start_time = get_time(self.start_time)
 		dates = self.get_dates_for_attendance(employee)
+		logger.info(f"Dates = {dates}")
 
 		for date in dates:
+			logger.info(f"Getting employee {employee} shift having data: {date} {start_time}")
 			timestamp = datetime.combine(date, start_time)
-			logger.info(f"Getting employee {employee} shift having timestamp {timestamp}")
 			shift_details = get_employee_shift(employee, timestamp, True)
 			if shift_details and shift_details.shift_type.name == self.name:
 				logger.info(f"Shift Assigned {shift_details} and employee {employee}")
