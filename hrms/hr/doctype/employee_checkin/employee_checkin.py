@@ -202,8 +202,8 @@ def mark_attendance_and_link_log(
     :param attendance_date: Date of the attendance to be created.
     :param working_hours: (optional)Number of working hours for the given date.
     """
-    log_names = [x.name for x in logs]
-    employee = logs[0].employee
+	log_names = [x.name for x in logs]
+	employee = logs[0].employee
 
 	if attendance_status == "Skip":
 		skip_attendance_in_checkins(log_names)
