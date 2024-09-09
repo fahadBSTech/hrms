@@ -33,7 +33,7 @@ class ShiftType(Document):
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
-			or not self.last_sync_of_checkin
+			#or not self.last_sync_of_checkin
 		):
 			logger.info(f"Skipping Shift due to; Auto-Attendance: {cint(self.enable_auto_attendance)}, Process Attendance After: {self.process_attendance_after}, Last Sync of Checkin: {self.last_sync_of_checkin}")
 			return
@@ -102,7 +102,7 @@ class ShiftType(Document):
 				"skip_auto_attendance": 0,
 				"attendance": ("is", "not set"),
 				"time": (">=", self.process_attendance_after),
-				"shift_actual_end": ("<", self.last_sync_of_checkin),
+				"shift_actual_end": ("<", getdate(self.last_sync_of_checkin)),
 				"shift": self.name,
 			},
 			order_by="employee,time",
