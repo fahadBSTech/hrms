@@ -14,8 +14,6 @@ def is_holiday(holiday_list, date):
 	return bool(holidays)
 
 
-
-
 @frappe.whitelist()
 def get_current_month_working_days(company, start_date, end_date):
     user = frappe.session.user
@@ -55,7 +53,7 @@ fields=['name', 'employee', 'status', 'attendance_date'])
     working_days_till_today = 0
     current_date = start_date
 
-    while current_date <= today:
+    while current_date <= end_date:
         if not is_holiday(holiday_list,
                           current_date) and current_date.weekday() < 5:  # Count weekdays and non-holidays as working days
             working_days_till_today += 1
@@ -67,6 +65,9 @@ fields=['name', 'employee', 'status', 'attendance_date'])
         'off_days': leave_days_count,
         'employee_working_days': actual_working_days_count
     }
+
+
+
 
 
 

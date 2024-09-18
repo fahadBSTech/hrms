@@ -387,7 +387,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-07-03 15:41:46.573619",
+ "modified": "2024-09-12 14:56:11.541687",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "HR",
@@ -405,7 +405,7 @@
    "role": "HR Manager"
   }
  ],
- "sequence_id": 9.0,
+ "sequence_id": 10.0,
  "shortcuts": [
   {
    "color": "Grey",

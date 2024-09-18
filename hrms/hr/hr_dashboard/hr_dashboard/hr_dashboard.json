@@ -1,0 +1,69 @@
+{
+ "cards": [
+  {
+   "card": "Total Absent (This Month)"
+  },
+  {
+   "card": "Total Present (This Month)"
+  },
+  {
+   "card": "Late Entry (This Month)"
+  },
+  {
+   "card": "Early Exit (This Month)"
+  },
+  {
+   "card": "Total Absent (This Week)"
+  },
+  {
+   "card": "Total Present (This Week)"
+  },
+  {
+   "card": "Early Exit (This Week)"
+  },
+  {
+   "card": "Late Entry (This Week)"
+  },
+  {
+   "card": "Total WFH-Approved"
+  },
+  {
+   "card": "Total WFH-Pending"
+  },
+  {
+   "card": "Total WFH (This Month)"
+  },
+  {
+   "card": "Employees Checked IN"
+  },
+  {
+   "card": "Missing Check-ins(Today)"
+  },
+  {
+   "card": "Total On-Leave(Monthly)"
+  },
+  {
+   "card": "Total On-Leave(Today)"
+  },
+  {
+   "card": "Total On-Leave(This Week)"
+  }
+ ],
+ "charts": [
+  {
+   "width": "Half"
+  }
+ ],
+ "creation": "2024-08-30 14:42:39.258754",
+ "dashboard_name": "HR Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2024-09-12 14:34:56.539022",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "HR Dashboard",
+ "owner": "Administrator"
+}
