@@ -16,118 +16,118 @@ from datetime import datetime
 
 
 class EmployeeCheckin(Document):
-    def validate(self):
-        validate_active_employee(self.employee)
-        self.validate_previous_date_logs()
-        self.validate_date_time()
-        self.validate_duplicate_log()
-        self.fetch_shift()
-        self.validate_check_leave_on_same_day()
-        if self.log_type == 'OUT':
-            self.validate_current_day_checkin()
-        self.validate_same_consecutive_logs()
+	def validate(self):
+		validate_active_employee(self.employee)
+		self.validate_previous_date_logs()
+		self.validate_date_time()
+		self.validate_duplicate_log()
+		self.fetch_shift()
+		self.validate_check_leave_on_same_day()
+		if self.log_type == 'OUT':
+			self.validate_current_day_checkin()
+		self.validate_same_consecutive_logs()
 
 
 
-    def validate_date_time(self):
-        date_format = f"{DATE_FORMAT} %H%M%S"
-        current_date_time = datetime.strptime(datetime.now(pytz.timezone('Asia/Karachi')).strftime(date_format), date_format)
-        if get_datetime(self.time) > current_date_time:
-            frappe.throw(_("check-{0} can't be set for the future date/time").format(self.log_type.lower()))
+	def validate_date_time(self):
+		date_format = f"{DATE_FORMAT} %H%M%S"
+		current_date_time = datetime.strptime(datetime.now(pytz.timezone('Asia/Karachi')).strftime(date_format), date_format)
+		if get_datetime(self.time) > current_date_time:
+			frappe.throw(_("check-{0} can't be set for the future date/time").format(self.log_type.lower()))
 
-    def validate_previous_date_logs(self):
-        current_date = datetime.now().date()
+	def validate_previous_date_logs(self):
+		current_date = datetime.now().date()
 
-        # Check if the attendance date is earlier than the current date
-        if frappe.utils.getdate(self.time) < current_date:
-            frappe.throw(
-                _(f"Cannot Check-{self.log_type.capitalize()} for past dates. Please select the current date or consult HR department."))
+		# Check if the attendance date is earlier than the current date
+		if frappe.utils.getdate(self.time) < current_date:
+			frappe.throw(
+				_(f"Cannot Check-{self.log_type.capitalize()} for past dates. Please select the current date or consult HR department."))
 
-    def validate_same_consecutive_logs(self):
-        # Get the current date
+	def validate_same_consecutive_logs(self):
+		# Get the current date
 
-        # Fetch the last check-in/check-out entry for the employee
-        last_log = frappe.db.get_value(
-            "Employee Checkin",
-            {"employee": self.employee},
-            ["log_type", "time"],
-            order_by="time desc"
-        )
+		# Fetch the last check-in/check-out entry for the employee
+		last_log = frappe.db.get_value(
+			"Employee Checkin",
+			{"employee": self.employee},
+			["log_type", "time"],
+			order_by="time desc"
+		)
 
-        if last_log:
-            last_log_type, last_log_time = last_log
+		if last_log:
+			last_log_type, last_log_time = last_log
 
-            # Get the date part of the last log time
-            last_log_date = frappe.utils.getdate(last_log_time)
+			# Get the date part of the last log time
+			last_log_date = frappe.utils.getdate(last_log_time)
 
-            # Check if the last log type is the same as the current log type and on the same day
-            if self.log_type.lower() == last_log_type.lower() and last_log_date == frappe.utils.getdate(frappe.utils.nowdate()):
-                frappe.throw(
-                    _("You cannot mark consecutive 'Check-{0}' entries on the same day without a '{1}' entry first.").format(
-                        self.log_type.lower(), "Check-out" if self.log_type.lower() == "in" else "Check-in"
-                    ))
-            if frappe.utils.get_datetime(self.time) < frappe.utils.get_datetime(last_log_time):
-                frappe.throw(
-                    _("Current log time cannot be earlier than the previous log time.")
-                )
-
-
+			# Check if the last log type is the same as the current log type and on the same day
+			if self.log_type.lower() == last_log_type.lower() and last_log_date == frappe.utils.getdate(frappe.utils.nowdate()):
+				frappe.throw(
+					_("You cannot mark consecutive 'Check-{0}' entries on the same day without a '{1}' entry first.").format(
+						self.log_type.lower(), "Check-out" if self.log_type.lower() == "in" else "Check-in"
+					))
+			if frappe.utils.get_datetime(self.time) < frappe.utils.get_datetime(last_log_time):
+				frappe.throw(
+					_("Current log time cannot be earlier than the previous log time.")
+				)
 
 
-    def validate_check_leave_on_same_day(self):
-        checkin_date = self.time.split(' ')[0]
-        doc = frappe.db.exists('Leave Application', {"employee": self.employee, "from_date": [">=", checkin_date], "to_date": ["<=", checkin_date], "status": "Approved", "half_day": ["!=", True]})
-        if doc:
-            frappe.throw(_("<b>Not Permitted:</b> Leave has been approved on the same date {0}").format(checkin_date))
 
-    def validate_duplicate_log(self):
-        doc = frappe.db.exists(
-            "Employee Checkin",
-            {
-                "employee": self.employee,
-                "time": self.time,
-                "name": ("!=", self.name),
-                "log_type": self.log_type,
-            },
-        )
-        if doc:
-            doc_link = frappe.get_desk_link("Employee Checkin", doc)
-            frappe.throw(
-                _("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
-            )
 
-    def validate_current_day_checkin(self):
-        query = "SELECT COUNT(log_type) FROM `tabEmployee Checkin` WHERE CAST(time as DATE)='%s' AND log_type='%s' AND employee = '%s'" % (self.time.split(" ")[0], "IN", self.employee)
-        docs = frappe.db.sql(query)
-        if docs[0][0] < 1:
-            frappe.throw(_("Please add check-in first"))
-        else:
-            pass
+	def validate_check_leave_on_same_day(self):
+		checkin_date = self.time.split(' ')[0]
+		doc = frappe.db.exists('Leave Application', {"employee": self.employee, "from_date": [">=", checkin_date], "to_date": ["<=", checkin_date], "status": "Approved", "half_day": ["!=", True]})
+		if doc:
+			frappe.throw(_("<b>Not Permitted:</b> Leave has been approved on the same date {0}").format(checkin_date))
 
-    def fetch_shift(self):
-        shift_actual_timings = get_actual_start_end_datetime_of_shift(
-            self.employee, get_datetime(self.time), True
-        )
-        if shift_actual_timings:
-            if (
-                shift_actual_timings.shift_type.determine_check_in_and_check_out
-                == "Strictly based on Log Type in Employee Checkin"
-                and not self.log_type
-                and not self.skip_auto_attendance
-            ):
-                frappe.throw(
-                    _("Log Type is required for check-ins falling in the shift: {0}.").format(
-                        shift_actual_timings.shift_type.name
-                    )
-                )
-            if not self.attendance:
-                self.shift = shift_actual_timings.shift_type.name
-                self.shift_actual_start = shift_actual_timings.actual_start
-                self.shift_actual_end = shift_actual_timings.actual_end
-                self.shift_start = shift_actual_timings.start_datetime
-                self.shift_end = shift_actual_timings.end_datetime
-        else:
-            self.shift = None
+	def validate_duplicate_log(self):
+		doc = frappe.db.exists(
+			"Employee Checkin",
+			{
+				"employee": self.employee,
+				"time": self.time,
+				"name": ("!=", self.name),
+				"log_type": self.log_type,
+			},
+		)
+		if doc:
+			doc_link = frappe.get_desk_link("Employee Checkin", doc)
+			frappe.throw(
+				_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
+			)
+
+	def validate_current_day_checkin(self):
+		query = "SELECT COUNT(log_type) FROM `tabEmployee Checkin` WHERE CAST(time as DATE)='%s' AND log_type='%s' AND employee = '%s'" % (self.time.split(" ")[0], "IN", self.employee)
+		docs = frappe.db.sql(query)
+		if docs[0][0] < 1:
+			frappe.throw(_("Please add check-in first"))
+		else:
+			pass
+
+	def fetch_shift(self):
+		shift_actual_timings = get_actual_start_end_datetime_of_shift(
+			self.employee, get_datetime(self.time), True
+		)
+		if shift_actual_timings:
+			if (
+				shift_actual_timings.shift_type.determine_check_in_and_check_out
+				== "Strictly based on Log Type in Employee Checkin"
+				and not self.log_type
+				and not self.skip_auto_attendance
+			):
+				frappe.throw(
+					_("Log Type is required for check-ins falling in the shift: {0}.").format(
+						shift_actual_timings.shift_type.name
+					)
+				)
+			if not self.attendance:
+				self.shift = shift_actual_timings.shift_type.name
+				self.shift_actual_start = shift_actual_timings.actual_start
+				self.shift_actual_end = shift_actual_timings.actual_end
+				self.shift_start = shift_actual_timings.start_datetime
+				self.shift_end = shift_actual_timings.end_datetime
+		else:
+			self.shift = None
 
 
 @frappe.whitelist()
@@ -181,15 +181,15 @@ def add_log_based_on_employee_field(
 
 
 def mark_attendance_and_link_log(
-        logs,
-        attendance_status,
-        attendance_date,
-        working_hours=None,
-        late_entry=False,
-        early_exit=False,
-        in_time=None,
-        out_time=None,
-        shift=None,
+		logs,
+		attendance_status,
+		attendance_date,
+		working_hours=None,
+		late_entry=False,
+		early_exit=False,
+		in_time=None,
+		out_time=None,
+		shift=None,
 ):
 	frappe.utils.logger.set_log_level("DEBUG")
 	logger = frappe.logger("checkin", allow_site=True, file_count=10)
@@ -197,11 +197,11 @@ def mark_attendance_and_link_log(
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
-    :param logs: The List of 'Employee Checkin'.
-    :param attendance_status: Attendance status to be marked. One of: (Present, Absent, Half Day, Skip). Note: 'On Leave' is not supported by this function.
-    :param attendance_date: Date of the attendance to be created.
-    :param working_hours: (optional)Number of working hours for the given date.
-    """
+	:param logs: The List of 'Employee Checkin'.
+	:param attendance_status: Attendance status to be marked. One of: (Present, Absent, Half Day, Skip). Note: 'On Leave' is not supported by this function.
+	:param attendance_date: Date of the attendance to be created.
+	:param working_hours: (optional)Number of working hours for the given date.
+	"""
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
 
