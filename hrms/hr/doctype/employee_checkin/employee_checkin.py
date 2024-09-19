@@ -15,8 +15,6 @@ from hrms.hr.utils import validate_active_employee
 from datetime import datetime
 
 
-
-
 class EmployeeCheckin(Document):
     def validate(self):
         validate_active_employee(self.employee)
@@ -132,8 +130,6 @@ class EmployeeCheckin(Document):
             self.shift = None
 
 
-
-
 @frappe.whitelist()
 def add_log_based_on_employee_field(
 	employee_field_value,
@@ -184,8 +180,6 @@ def add_log_based_on_employee_field(
 	return doc
 
 
-
-
 def mark_attendance_and_link_log(
         logs,
         attendance_status,
@@ -197,119 +191,123 @@ def mark_attendance_and_link_log(
         out_time=None,
         shift=None,
 ):
-    frappe.utils.logger.set_log_level("DEBUG")
-    logger = frappe.logger("attendance_for_checkins", allow_site=True, file_count=10)
+	frappe.utils.logger.set_log_level("DEBUG")
+	logger = frappe.logger("checkin", allow_site=True, file_count=10)
 
-    """Creates an attendance and links the attendance to the Employee Checkin.
-    Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
+	"""Creates an attendance and links the attendance to the Employee Checkin.
+	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
     :param logs: The List of 'Employee Checkin'.
     :param attendance_status: Attendance status to be marked. One of: (Present, Absent, Half Day, Skip). Note: 'On Leave' is not supported by this function.
     :param attendance_date: Date of the attendance to be created.
     :param working_hours: (optional)Number of working hours for the given date.
     """
-    log_names = [x.name for x in logs]
-    employee = logs[0].employee
+	log_names = [x.name for x in logs]
+	employee = logs[0].employee
 
-    if attendance_status == "Skip":
-        skip_attendance_in_checkins(log_names)
-        return None
+	if attendance_status == "Skip":
+		skip_attendance_in_checkins(log_names)
+		logger.info("Attendance skipped due to attendance_status")
+		return None
 
-    elif attendance_status in ("Present", "Absent", "Half Day"):
-        try:
-            frappe.db.savepoint("attendance_creation")
-            attendance = frappe.new_doc("Attendance")
-            attendance.update(
-                {
-                    "doctype": "Attendance",
-                    "employee": employee,
-                    "attendance_date": attendance_date,
-                    "status": attendance_status,
-                    "working_hours": working_hours,
-                    "shift": shift,
-                    "late_entry": late_entry,
-                    "early_exit": early_exit,
-                    "in_time": in_time,
-                    "out_time": out_time,
-                }
-            ).submit()
-            if attendance_status == "Absent":
-                attendance.add_comment(
-                    text=_("Employee was marked Absent for not meeting the working hours threshold.")
-                )
-            message = "{0} marked for {1} in shift {2}. Time for checkin is {3} and checkout is {4} and total working hours are {5}".format(attendance_status, employee, shift.name, in_time, out_time, working_hours)
-            logger.info(message)
-            update_attendance_in_checkins(log_names, attendance.name)
-            return attendance
+	elif attendance_status in ("Present", "Absent", "Half Day"):
+		try:
+			frappe.db.savepoint("attendance_creation")
+			attendance = frappe.new_doc("Attendance")
+			attendance.update(
+				{
+					"doctype": "Attendance",
+					"employee": employee,
+					"attendance_date": attendance_date,
+					"status": attendance_status,
+					"working_hours": working_hours,
+					"shift": shift,
+					"late_entry": late_entry,
+					"early_exit": early_exit,
+					"in_time": in_time,
+					"out_time": out_time,
+				}
+			).submit()
 
-        except frappe.ValidationError as e:
-            handle_attendance_exception(log_names, e)
+			if attendance_status == "Absent":
+				attendance.add_comment(
+					text=_("Employee was marked Absent for not meeting the working hours threshold.")
+				)
+			message = "{0} marked for {1} in shift {2}. Time for checkin is {3} and checkout is {4} and total working hours are {5}".format(attendance_status, employee, shift, in_time, out_time, working_hours)
+			logger.info(message)
+			logger.info(f"date: {attendance_date}, late_entry: {late_entry}, early_exit: {early_exit}")
+			update_attendance_in_checkins(log_names, attendance.name)
+			return attendance
 
-    else:
-        frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
+		except frappe.ValidationError as e:
+			handle_attendance_exception(log_names, e)
+
+	else:
+		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
+
 
 
 
 def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
-    """Given a set of logs in chronological order calculates the total working hours based on the parameters.
-    Zero is returned for all invalid cases.
+	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
+	Zero is returned for all invalid cases.
 
-    :param logs: The List of 'Employee Checkin'.
-    :param check_in_out_type: One of: 'Alternating entries as IN and OUT during the same shift', 'Strictly based on Log Type in Employee Checkin'
-    :param working_hours_calc_type: One of: 'First Check-in and Last Check-out', 'Every Valid Check-in and Check-out'
-    """
-    total_hours = 0
-    in_time = out_time = None
-    if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
-        in_time = logs[0].time
-        if len(logs) >= 2:
-            out_time = logs[-1].time
-        if working_hours_calc_type == "First Check-in and Last Check-out":
-            # assumption in this case: First log always taken as IN, Last log always taken as OUT
-            total_hours = time_diff_in_hours(in_time, logs[-1].time)
-        elif working_hours_calc_type == "Every Valid Check-in and Check-out":
-            logs = logs[:]
-            while len(logs) >= 2:
-                total_hours += time_diff_in_hours(logs[0].time, logs[1].time)
-                del logs[:2]
+	:param logs: The List of 'Employee Checkin'.
+	:param check_in_out_type: One of: 'Alternating entries as IN and OUT during the same shift', 'Strictly based on Log Type in Employee Checkin'
+	:param working_hours_calc_type: One of: 'First Check-in and Last Check-out', 'Every Valid Check-in and Check-out'
+	"""
+	total_hours = 0
+	in_time = out_time = None
+	if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
+		in_time = logs[0].time
+		if len(logs) >= 2:
+			out_time = logs[-1].time
+		if working_hours_calc_type == "First Check-in and Last Check-out":
+			# assumption in this case: First log always taken as IN, Last log always taken as OUT
+			total_hours = time_diff_in_hours(in_time, logs[-1].time)
+		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
+			logs = logs[:]
+			while len(logs) >= 2:
+				total_hours += time_diff_in_hours(logs[0].time, logs[1].time)
+				del logs[:2]
 
-    elif check_in_out_type == "Strictly based on Log Type in Employee Checkin":
-        if working_hours_calc_type == "First Check-in and Last Check-out":
-            first_in_log_index = find_index_in_dict(logs, "log_type", "IN")
-            first_in_log = logs[first_in_log_index] if first_in_log_index or first_in_log_index == 0 else None
-            last_out_log_index = find_index_in_dict(reversed(logs), "log_type", "OUT")
-            last_out_log = (
-                logs[len(logs) - 1 - last_out_log_index]
-                if last_out_log_index or last_out_log_index == 0
-                else None
-            )
-            if first_in_log and last_out_log:
-                in_time, out_time = first_in_log.time, last_out_log.time
-                total_hours = time_diff_in_hours(in_time, out_time)
-        elif working_hours_calc_type == "Every Valid Check-in and Check-out":
-            in_log = out_log = None
-            for log in logs:
-                if in_log and out_log:
-                    if not in_time:
-                        in_time = in_log.time
-                    out_time = out_log.time
-                    total_hours += time_diff_in_hours(in_log.time, out_log.time)
-                    in_log = out_log = None
-                if not in_log:
-                    in_log = log if log.log_type == "IN" else None
-                    if in_log and not in_time:
-                        in_time = in_log.time
-                elif not out_log:
-                    out_log = log if log.log_type == "OUT" else None
-            if (in_log and not out_log):
-                out_time = in_log.shift_end
-            if in_log and out_log:
-                out_time = out_log.time
-            print("in and out:", in_log.time if in_log else None, out_time)
-            if in_log and out_time:
-                total_hours += time_diff_in_hours(in_log.time, out_time)
+	elif check_in_out_type == "Strictly based on Log Type in Employee Checkin":
+		if working_hours_calc_type == "First Check-in and Last Check-out":
+			first_in_log_index = find_index_in_dict(logs, "log_type", "IN")
+			first_in_log = logs[first_in_log_index] if first_in_log_index or first_in_log_index == 0 else None
+			last_out_log_index = find_index_in_dict(reversed(logs), "log_type", "OUT")
+			last_out_log = (
+				logs[len(logs) - 1 - last_out_log_index]
+				if last_out_log_index or last_out_log_index == 0
+				else None
+			)
+			if first_in_log and last_out_log:
+				in_time, out_time = first_in_log.time, last_out_log.time
+				total_hours = time_diff_in_hours(in_time, out_time)
+		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
+			in_log = out_log = None
+			for log in logs:
+				if in_log and out_log:
+					if not in_time:
+						in_time = in_log.time
+					out_time = out_log.time
+					total_hours += time_diff_in_hours(in_log.time, out_log.time)
+					in_log = out_log = None
+				if not in_log:
+					in_log = log if log.log_type == "IN" else None
+					if in_log and not in_time:
+						in_time = in_log.time
+				elif not out_log:
+					out_log = log if log.log_type == "OUT" else None
+			if (in_log and not out_log):
+				out_time = in_log.shift_end
+			if in_log and out_log:
+				out_time = out_log.time
+			print("in and out:", in_log.time if in_log else None, out_time)
+			if in_log and out_time:
+				total_hours += time_diff_in_hours(in_log.time, out_time)
 
-    return total_hours, in_time, out_time
+	return total_hours, in_time, out_time
 
 
 
@@ -361,3 +359,4 @@ def update_attendance_in_checkins(log_names: list, attendance_id: str):
 		.set("attendance", attendance_id)
 		.where(EmployeeCheckin.name.isin(log_names))
 	).run()
+
