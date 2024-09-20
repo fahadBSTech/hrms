@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "json": "{\"filters\":[[\"Leave Application\",\"status\",\"=\",\"Approved\",false],[\"Leave Application\",\"from_date\",\">=\",\"2024-01-01\",false],[\"Leave Application\",\"to_date\",\"<=\",\"2024-12-31\",false]],\"fields\":[[\"employee\",\"Leave Application\"],[\"_aggregate_column\",\"Leave Application\"]],\"order_by\":\"`tabLeave Application`.`modified` desc\",\"add_totals_row\":0,\"page_length\":20,\"column_widths\":{\"employee\":120,\"_aggregate_column\":200},\"group_by\":{\"group_by\":\"`tabLeave Application`.`employee`\",\"aggregate_function\":\"count\"}}",
- "modified": "2024-08-16 18:07:22.301552",
+ "modified": "2024-09-20 15:54:34.513149",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leaves Availed Report",
@@ -24,28 +24,10 @@
    "role": "HR Manager"
   },
   {
-   "role": "Leave Approver"
-  },
-  {
-   "role": "Employee"
-  },
-  {
    "role": "HR User"
   },
   {
-   "role": "Projects User"
-  },
-  {
-   "role": "Developer"
-  },
-  {
-   "role": "Project Manager"
-  },
-  {
-   "role": "Accounts Manager"
-  },
-  {
-   "role": "Employee Self Service"
+   "role": "System Manager"
   }
  ]
 }
