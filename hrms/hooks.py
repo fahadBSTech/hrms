@@ -197,8 +197,10 @@ scheduler_events = {
         "0 2 * * *": [
             "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts"
 				],
-	"*/15 * * * *": [
-		"hrms.hr.doctype.shift_type.shift_type.notify_employees_to_checkin_or_checkout"]
+		"*/15 * * * *": [
+			"hrms.hr.doctype.shift_type.shift_type.notify_employees_to_checkin_or_checkout"],
+		"0 10 * * *": [
+				"hrms.hr.doctype.work_from_home.work_from_home.send_wfh_feedback_forms"]
 		}
 }
 
