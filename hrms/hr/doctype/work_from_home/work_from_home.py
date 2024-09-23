@@ -5,6 +5,7 @@
 import frappe
 from frappe.model.document import Document
 import datetime
+from frappe import _
 
 
 @frappe.whitelist()
@@ -34,9 +35,27 @@ def get_number_of_wfh_days(
 
 class WorkFromHome(Document):
 	def validate(self):
+		self.validate_same_day_wfh()
 		self.validate_leave_on_same_day()
 		self.half_day_wfh_scenarios()
 
+	def validate_same_day_wfh(self):
+		"""Validate if a WFH already exists for the same employee on the same date."""
+
+		# Check if there is any overlapping WFH request for the same employee
+		existing_wfh = frappe.db.exists(
+			"Work From Home",
+			{
+				"employee": self.employee,
+				"from_date": ["<=", self.to_date],
+				"to_date": [">=", self.from_date],
+				"docstatus": ["!=", 2],  # Exclude cancelled records
+				"name": ["!=", self.name]  # Exclude the current WFH record
+			}
+		)
+
+		if existing_wfh:
+			frappe.throw(_("A Work From Home entry already exists for this employee on the selected date(s)."))
 	def validate_leave_on_same_day(self):
 		conflicting_leaves = frappe.db.sql("""
 								SELECT name FROM `tabLeave Application`
@@ -45,7 +64,7 @@ class WorkFromHome(Document):
 								OR (from_date = %s AND half_day = 1)) 
 							""", (self.employee, self.from_date, self.to_date, self.from_date))
 		if conflicting_leaves:
-			frappe.throw(f"Cannot apply for WFH as there is an existing leave on the same date.")
+			frappe.throw(_(f"Cannot apply for WFH as there is an existing leave on the same date."))
 
 	def half_day_wfh_scenarios(self):
 		if not self.half_day:
@@ -56,7 +75,7 @@ class WorkFromHome(Document):
 						OR (from_date = %s AND half_day = 1))     # half-day leave on WFH day
 					""", (self.employee, self.from_date, self.to_date, self.from_date))
 			if conflicting_leaves:
-				frappe.throw(f"Cannot apply for full-day WFH as there is an existing full-day leave on the same date.")
+				frappe.throw(_(f"Cannot apply for full-day WFH as there is an existing full-day leave on the same date."))
 
 	def before_save(self):
 		if self.status == 'Approved' and self.wfh_limit_reached():
@@ -79,7 +98,7 @@ class WorkFromHome(Document):
 		return True if total_wfh_days + self.total_days > 5 else False
 	def before_submit(self):
 		if self.status != 'Approved' and self.status != 'Rejected':
-			frappe.throw("Only document with status 'Approved' or 'Rejected' can be submitable.")
+			frappe.throw(_("Only document with status 'Approved' or 'Rejected' can be submitable."))
 
 	def after_insert(self):
 		try:
