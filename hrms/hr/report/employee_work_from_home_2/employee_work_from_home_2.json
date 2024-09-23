@@ -55,7 +55,7 @@
  ],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2024-08-16 18:38:55.345379",
+ "modified": "2024-09-20 15:54:00.126422",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee work from home-2",
@@ -63,6 +63,7 @@
  "prepared_report": 0,
  "ref_doctype": "Attendance Request",
  "report_name": "Employee work from home-2",
+ "report_script": "",
  "report_type": "Script Report",
  "roles": [
   {
@@ -73,15 +74,6 @@
   },
   {
    "role": "HR Manager"
-  },
-  {
-   "role": "Employee"
-  },
-  {
-   "role": "Project Manager"
-  },
-  {
-   "role": "Employee Self Service"
   }
  ]
 }
