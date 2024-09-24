@@ -157,6 +157,17 @@ def send_birthday_wishes(birthday_person, sender=None):
 	)
 
 
+def send_anniversary_wishes(birthday_person, sender=None):
+	employee_name = birthday_person["name"]
+	email_template = frappe.get_doc("Email Template", "Anniversary Wish Email")
+	message_res = frappe.render_template(email_template.response, {"employee_name": employee_name})
+	frappe.sendmail(
+		sender=sender,
+		recipients=birthday_person["user_id"],
+		subject=_(f"Happy Work Anniversary, {employee_name}"),
+		message=message_res
+	)
+
 def get_employees_who_are_born_today():
 	"""Get all employee born today & group them based on their company"""
 	return get_employees_having_an_event_today("birthday")
@@ -233,21 +244,23 @@ def send_work_anniversary_reminders():
 	message += _("Everyone, let’s congratulate them on their work anniversary!")
 
 	for company, anniversary_persons in employees_joined_today.items():
-		employee_emails = get_all_employee_emails(company)
-		anniversary_person_emails = [get_employee_email(doc) for doc in anniversary_persons]
-		recipients = list(set(employee_emails) - set(anniversary_person_emails))
+		# employee_emails = get_all_employee_emails(company)
+		# anniversary_person_emails = [get_employee_email(doc) for doc in anniversary_persons]
+		# recipients = list(set(employee_emails) - set(anniversary_person_emails))
+		#
+		# reminder_text = get_work_anniversary_reminder_text(anniversary_persons)
+		# send_work_anniversary_reminder(recipients, reminder_text, anniversary_persons, message, sender)
+		#
+		# if len(anniversary_persons) > 1:
+		# 	# email for people sharing work anniversaries
+		# 	for person in anniversary_persons:
+		# 		person_email = person["user_id"] or person["personal_email"] or person["company_email"]
+		# 		others = [d for d in anniversary_persons if d != person]
+		# 		reminder_text = get_work_anniversary_reminder_text(others)
+		# 		send_work_anniversary_reminder(person_email, reminder_text, others, message, sender)
 
-		reminder_text = get_work_anniversary_reminder_text(anniversary_persons)
-		send_work_anniversary_reminder(recipients, reminder_text, anniversary_persons, message, sender)
-
-		if len(anniversary_persons) > 1:
-			# email for people sharing work anniversaries
-			for person in anniversary_persons:
-				person_email = person["user_id"] or person["personal_email"] or person["company_email"]
-				others = [d for d in anniversary_persons if d != person]
-				reminder_text = get_work_anniversary_reminder_text(others)
-				send_work_anniversary_reminder(person_email, reminder_text, others, message, sender)
-
+		for an_person in anniversary_persons:
+			send_anniversary_wishes(an_person, sender=sender)
 
 def get_work_anniversary_reminder_text(anniversary_persons: list) -> str:
 	if len(anniversary_persons) == 1:
