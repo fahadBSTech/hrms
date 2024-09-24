@@ -109,6 +109,9 @@ def send_birthday_reminders():
 				others = [d for d in birthday_persons if d != person]
 				reminder_text, message = get_birthday_reminder_text_and_message(others)
 				send_birthday_reminder(person_email, reminder_text, others, message, sender)
+		for bd_employee in birthday_persons:
+			send_birthday_wishes(bd_employee, sender=sender)
+
 
 
 def get_birthday_reminder_text_and_message(birthday_persons):
@@ -139,6 +142,18 @@ def send_birthday_reminder(recipients, reminder_text, birthday_persons, message,
 			message=message,
 		),
 		header=_("Birthday Reminder 🎂"),
+	)
+
+
+def send_birthday_wishes(birthday_person, sender=None):
+	employee_name = birthday_person["name"]
+	email_template = frappe.get_doc("Email Template", "Birthday Wish Template")
+	message_res = frappe.render_template(email_template.response, {"employee_name": employee_name})
+	frappe.sendmail(
+		sender=sender,
+		recipients=birthday_person["user_id"],
+		subject=_(f"Happy Birthday, {employee_name}🎂"),
+		message=message_res
 	)
 
 
