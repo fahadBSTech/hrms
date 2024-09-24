@@ -232,7 +232,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Daily Work Summary Replies",
    "link_count": 0,
    "link_to": "Daily Work Summary Replies",

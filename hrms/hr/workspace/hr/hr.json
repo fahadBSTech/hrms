@@ -172,7 +172,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Employee Exits",
    "link_count": 0,
    "link_to": "Employee Exits",
