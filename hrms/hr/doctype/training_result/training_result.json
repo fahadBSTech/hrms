@@ -52,7 +52,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2022-01-18 19:31:44.900034",
+ "modified": "2023-12-07 15:40:50.624631",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Training Result",
@@ -73,6 +73,15 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1
   }
  ],
  "search_fields": "training_event",

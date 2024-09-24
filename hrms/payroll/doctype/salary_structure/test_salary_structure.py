@@ -168,6 +168,7 @@ def make_salary_structure(
 	payroll_period=None,
 	include_flexi_benefits=False,
 	base=None,
+	allow_duplicate=False,
 ):
 	if not currency:
 		currency = erpnext.get_default_currency()
@@ -199,7 +200,7 @@ def make_salary_structure(
 	if not dont_submit:
 		salary_structure_doc.submit()
 
-	filters = {"employee": employee, "docstatus": 1}
+	filters = {"employee": employee, "docstatus": 1, "salary_structure": salary_structure}
 	if not from_date and payroll_period:
 		from_date = payroll_period.start_date
 
@@ -219,6 +220,7 @@ def make_salary_structure(
 			currency=currency,
 			payroll_period=payroll_period,
 			base=base,
+			allow_duplicate=allow_duplicate,
 		)
 
 	return salary_structure_doc

@@ -213,30 +213,40 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	"all": [
-		"hrms.hr.doctype.interview.interview.send_interview_reminder",
-	],
-	"hourly": [
-		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
-	],
+    "all": [
+        "hrms.hr.doctype.interview.interview.send_interview_reminder",
+    ],
+    "hourly": [
+        "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.trigger_emails",
+    ],
 	"hourly_long": [
-		"hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
+		# "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
 		"hrms.hr.doctype.shift_assignment_schedule.shift_assignment_schedule.process_auto_shift_creation",
 	],
-	"daily": [
-		"hrms.controllers.employee_reminders.send_birthday_reminders",
-		"hrms.controllers.employee_reminders.send_work_anniversary_reminders",
-		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
-		"hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
-		"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
-	],
-	"daily_long": [
-		"hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
-		"hrms.hr.utils.generate_leave_encashment",
-		"hrms.hr.utils.allocate_earned_leaves",
-	],
-	"weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
-	"monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly"],
+    "daily": [
+        "hrms.controllers.employee_reminders.send_birthday_reminders",
+        "hrms.controllers.employee_reminders.send_work_anniversary_reminders",
+        "hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
+        "hrms.hr.doctype.interview.interview.send_daily_feedback_reminder",
+"hrms.hr.doctype.job_opening.job_opening.close_expired_job_openings",
+    ],
+    "daily_long": [
+        "hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
+        "hrms.hr.utils.generate_leave_encashment",
+        "hrms.hr.utils.allocate_earned_leaves",
+    ],
+    "weekly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_weekly"],
+    "monthly": ["hrms.controllers.employee_reminders.send_reminders_in_advance_monthly", "hrms.hr.employee_allowances_data.allowances_calculation.calculate_employee_fuel_allowance"],
+	"yearly": ["hrms.hr.employee_allowances_data.allowances_calculation.reset_medical_allowances"],
+	"cron": {
+        "0 2 * * *": [
+            "hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts"
+				],
+		"*/15 * * * *": [
+			"hrms.hr.doctype.shift_type.shift_type.notify_employees_to_checkin_or_checkout"],
+		"0 10 * * *": [
+				"hrms.hr.doctype.work_from_home.work_from_home.send_wfh_feedback_forms"]
+		}
 }
 
 advance_payment_doctypes = ["Gratuity", "Employee Advance"]
@@ -287,9 +297,12 @@ global_search_doctypes = {
 	],
 }
 
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "hrms.event.get_events"
-# }
+override_whitelisted_methods = {
+	# "frappe.desk.doctype.event.event.get_events": "hrms.event.get_events"
+	"hrms.utils.holiday_list.get_current_month_working_days": "hrms.utils.holiday_list.get_current_month_working_days",
+	"hrms.utils.holiday_list.get_leave_summary": "hrms.utils.holiday_list.get_leave_summary"
+}
+
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -301,6 +314,14 @@ override_doctype_dashboards = {
 	"Project": "hrms.overrides.dashboard_overrides.get_dashboard_for_project",
 	"Timesheet": "hrms.overrides.dashboard_overrides.get_dashboard_for_timesheet",
 }
+permission_query_conditions = {
+"Training Event": "hrms.permissions.te_query"
+}
+
+has_permission = {
+"Training Event" : "hrms.permissions.has_te_permission_query"
+}
+
 
 # exempt linked doctypes from being automatically cancelled
 #
