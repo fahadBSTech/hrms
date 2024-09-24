@@ -52,6 +52,9 @@ frappe.ui.form.on("Work From Home", {
         frm.trigger('calculate_total_days');
     },
 
+    half_day_date(frm) {
+        frm.trigger('calculate_total_days');
+    },
     // Function to calculate total days
     calculate_total_days(frm) {
         if (frm.doc.from_date && frm.doc.to_date && frm.doc.employee) {
