@@ -10,7 +10,6 @@ from frappe import _
 
 @frappe.whitelist()
 def get_number_of_wfh_days(
-		employee: str,
 		from_date: datetime.date,
 		to_date: datetime.date,
 		half_day: int | str | None = None,
@@ -60,7 +59,7 @@ class WorkFromHome(Document):
 		conflicting_leaves = frappe.db.sql("""
 								SELECT name FROM `tabLeave Application`
 								WHERE employee = %s AND docstatus = 1
-								AND ((from_date <= %s AND to_date >= %s)  # leave overlaps with WFH
+								AND ((from_date >= %s AND to_date <= %s)  # leave overlaps with WFH
 								OR (from_date = %s AND half_day = 1)) 
 							""", (self.employee, self.from_date, self.to_date, self.from_date))
 		if conflicting_leaves:
