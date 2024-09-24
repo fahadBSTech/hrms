@@ -15,6 +15,7 @@
   "from_date",
   "to_date",
   "half_day",
+  "half_day_date",
   "section_whf_2",
   "approver_id",
   "approver",
@@ -24,7 +25,8 @@
   "col_break_2",
   "status",
   "amended_from",
-  "naming_series"
+  "naming_series",
+  "total_days"
  ],
  "fields": [
   {
@@ -140,12 +142,23 @@
    "fieldname": "half_day",
    "fieldtype": "Check",
    "label": "Half day"
+  },
+  {
+   "fieldname": "total_days",
+   "fieldtype": "Float",
+   "label": "Total Days"
+  },
+  {
+   "depends_on": "eval:doc.half_day && doc.from_date && doc.to_date && (doc.from_date != doc.to_date)",
+   "fieldname": "half_day_date",
+   "fieldtype": "Date",
+   "label": "Half Day Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-02 18:43:40.223412",
+ "modified": "2024-09-23 18:27:21.575984",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Work From Home",
