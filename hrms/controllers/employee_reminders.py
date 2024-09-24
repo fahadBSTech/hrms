@@ -247,7 +247,22 @@ def send_work_anniversary_reminders():
 				others = [d for d in anniversary_persons if d != person]
 				reminder_text = get_work_anniversary_reminder_text(others)
 				send_work_anniversary_reminder(person_email, reminder_text, others, message, sender)
+		for an_person in anniversary_persons:
+			send_anniversary_wishes(an_person, sender=sender)
 
+def send_anniversary_wishes(anniversary_person, sender=None):
+	employee_name = anniversary_person["name"]
+	number_of_years = getdate().year - anniversary_person["date_of_joining"].year
+	email_template = frappe.get_doc("Email Template", "Anniversary Wish Email")
+	message_res = frappe.render_template(email_template.response,
+										 {"employee_name": employee_name,
+										  "number_of_years": number_of_years})
+	frappe.sendmail(
+		sender=sender,
+		recipients=anniversary_person["user_id"],
+		subject=_(f"Happy Work Anniversary, {employee_name}"),
+		message=message_res
+	)
 
 def get_work_anniversary_reminder_text(anniversary_persons: list) -> str:
 	if len(anniversary_persons) == 1:
