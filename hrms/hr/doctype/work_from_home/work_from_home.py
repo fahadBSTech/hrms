@@ -33,10 +33,31 @@ def get_number_of_wfh_days(
 
 
 class WorkFromHome(Document):
+
 	def validate(self):
+		self.validate_holiday()
 		self.validate_same_day_wfh()
 		self.validate_leave_on_same_day()
 		self.half_day_wfh_scenarios()
+
+	def validate_holiday(self):
+		if self.employee and self.from_date and self.to_date:
+			# Get the employee's holiday list
+			holiday_list = frappe.db.get_value("Employee", self.employee, "holiday_list")
+
+			if not holiday_list:
+				frappe.throw("No holiday list assigned to the employee.")
+
+			# Fetch holidays between the from_date and to_date
+			holidays = frappe.db.sql("""
+	            SELECT holiday_date FROM `tabHoliday`
+	            WHERE parent = %s AND holiday_date BETWEEN %s AND %s
+	        """, (holiday_list, self.from_date, self.to_date), as_dict=True)
+
+			if holidays:
+				holiday_dates = ", ".join([str(holiday.holiday_date) for holiday in holidays])
+				frappe.throw(
+					f"Work from home cannot be applied on holidays. These dates fall on holidays: {holiday_dates}")
 
 	def validate_same_day_wfh(self):
 		"""Validate if a WFH already exists for the same employee on the same date."""
@@ -93,7 +114,6 @@ class WorkFromHome(Document):
 					AND docstatus = 1
 				""", (self.employee, first_day_of_month, last_day_of_month))
 			total_wfh_days = total_wfh_days[0][0] if total_wfh_days else 0
-			frappe.log_error(total_wfh_days + self.total_days)
 		return True if total_wfh_days + self.total_days > 5 else False
 	def before_submit(self):
 		if self.status != 'Approved' and self.status != 'Rejected':
