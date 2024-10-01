@@ -109,7 +109,7 @@ class WorkFromHome(Document):
 			first_day_of_month = frappe.utils.get_first_day(self.from_date)
 			last_day_of_month = frappe.utils.get_last_day(self.from_date)
 			total_wfh_days = frappe.db.sql("""
-					SELECT SUM(total_days) FROM `tabWork From Home`
+					SELECT COALESCE(SUM(total_days), 0) FROM `tabWork From Home`
 					WHERE employee = %s AND from_date BETWEEN %s AND %s
 					AND docstatus = 1
 				""", (self.employee, first_day_of_month, last_day_of_month))
