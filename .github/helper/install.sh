@@ -10,7 +10,7 @@ sudo apt install libcups2-dev redis-server mariadb-client-10.6
 
 pip install frappe-bench
 
-git clone https://github.com/frappe/frappe --branch "$BRANCH_TO_CLONE" --depth 1
+git clone https://github.com/Bitsol-Technologies/frappe --branch "$BRANCH_TO_CLONE" --depth 1
 bench init --skip-assets --frappe-path ~/frappe --python "$(which python)" frappe-bench
 
 mkdir ~/frappe-bench/sites/test_site
@@ -41,10 +41,11 @@ sed -i 's/socketio:/# socketio:/g' Procfile
 sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 bench get-app payments --branch ${BRANCH_TO_CLONE%"-hotfix"}
-bench get-app https://github.com/frappe/erpnext --branch "$BRANCH_TO_CLONE" --resolve-deps
-bench get-app https://github.com/frappe/lending --branch ${BRANCH_TO_CLONE%"-hotfix"}
+bench get-app https://github.com/Bitsol-Technologies/erpnext --branch "$BRANCH_TO_CLONE" --resolve-deps
+bench get-app https://github.com/Bitsol-Technologies/lending --branch ${BRANCH_TO_CLONE%"-hotfix"}
 bench get-app hrms "${GITHUB_WORKSPACE}"
 bench setup requirements --dev
+bench pip install firebase_admin
 
 bench start &>> ~/frappe-bench/bench_start.log &
 CI=Yes bench build --app frappe &
