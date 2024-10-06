@@ -33,6 +33,7 @@ def get_number_of_wfh_days(
 
 
 class WorkFromHome(Document):
+
 	def validate(self):
 		self.validate_same_day_wfh()
 		self.validate_leave_on_same_day()
@@ -88,12 +89,11 @@ class WorkFromHome(Document):
 			first_day_of_month = frappe.utils.get_first_day(self.from_date)
 			last_day_of_month = frappe.utils.get_last_day(self.from_date)
 			total_wfh_days = frappe.db.sql("""
-					SELECT SUM(total_days) FROM `tabWork From Home`
+					SELECT COALESCE(SUM(total_days), 0) FROM `tabWork From Home`
 					WHERE employee = %s AND from_date BETWEEN %s AND %s
 					AND docstatus = 1
 				""", (self.employee, first_day_of_month, last_day_of_month))
 			total_wfh_days = total_wfh_days[0][0] if total_wfh_days else 0
-			frappe.log_error(total_wfh_days + self.total_days)
 		return True if total_wfh_days + self.total_days > 5 else False
 	def before_submit(self):
 		if self.status != 'Approved' and self.status != 'Rejected':
