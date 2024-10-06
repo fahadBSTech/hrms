@@ -75,7 +75,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		set_employee_name(self)
 		self.validate_dates()
 		self.validate_balance_leaves()
-		self.validate_holiday()
 		self.validate_leave_overlap()
 		self.validate_max_days()
 		self.show_block_day_warning()
@@ -86,24 +85,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
-
-	def validate_holiday(self):
-		if self.employee and self.from_date and self.to_date:
-			# Get the employee's holiday list
-			holiday_list = frappe.db.get_value("Employee", self.employee, "holiday_list")
-
-			if not holiday_list:
-				frappe.throw("No holiday list assigned to the employee.")
-
-			# Fetch holidays between the from_date and to_date
-			holidays = frappe.db.sql("""
-	            SELECT holiday_date FROM `tabHoliday`
-	            WHERE parent = %s AND holiday_date BETWEEN %s AND %s
-	        """, (holiday_list, self.from_date, self.to_date), as_dict=True)
-
-			if holidays:
-				holiday_dates = ", ".join([str(holiday.holiday_date) for holiday in holidays])
-				frappe.throw(f"Leave cannot be applied on holidays. These dates fall on holidays: {holiday_dates}")
 
 	def on_update(self):
 		if self.status == "Open" and self.docstatus < 1:
