@@ -24,7 +24,7 @@ def send_push_notification(token, title=None, body=None, log=None):
     )
 
     # Send the message
-    response = messaging.send_multicast(message)
+    response = messaging.send_each_for_multicast(message)
     print("Push Notification sent Successfully")
 
 def get_message_text(log):
