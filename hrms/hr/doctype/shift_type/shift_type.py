@@ -399,12 +399,14 @@ def notify_employees_to_checkin_or_checkout():
 			employee = frappe.get_doc('Employee', emp)
 			if employee.custom_fcm_token:
 				notify_checkin.append(employee.custom_fcm_token)
+			frappe.enqueue(method="fcm_notification.send_notification.send_push_to_user", email=employee.user_id, title="Don’t Forget to Check In!", message="Good morning! Please remember to check in for your shift. Have a productive day!")
 		employees_closer_to_checkout = get_assigned_employees_with_specified_threshold(shift.name,
 																							 end_time=time_difference_out)
 		for emp in employees_closer_to_checkout:
 			employee = frappe.get_doc('Employee', emp)
 			if employee.custom_fcm_token:
 				notify_checkout.append(employee.custom_fcm_token)
+			frappe.enqueue(method="fcm_notification.send_notification.send_push_to_user", email=employee.user_id, title="Time to Check Out!", message="Your shift is almost over. Please remember to check out. Have a great evening!")
 		notification_logger.info(f"Employees to be notified for Check In: {notify_checkin}")
 		notification_logger.info(f"Employees to be notified for Check Out: {notify_checkout}")
 		if notify_checkin:

@@ -113,7 +113,11 @@ class WorkFromHome(Document):
 						cc=self.team_lead_id,
 						sender=sender_email,
 						subject=email_template.subject,
-						message=message_res
+						message=message_res,
+						create_notification_log=True,
+						reference_doctype=self.doctype,
+						reference_name=self.name,
+						from_users=[sender_email]
 					)
 					frappe.msgprint(
 						("Email sent to HR <b>%s</b> and the lead <b>%s</b>") % (self.approver_id, self.team_lead_id))
