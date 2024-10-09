@@ -142,6 +142,8 @@ def send_birthday_reminder(recipients, reminder_text, birthday_persons, message,
 			message=message,
 		),
 		header=_("Birthday Reminder 🎂"),
+		create_notification_log=True,
+		from_users=[person['user_id'] for person in birthday_persons]
 	)
 
 
@@ -153,7 +155,8 @@ def send_birthday_wishes(birthday_person, sender=None):
 		sender=sender,
 		recipients=birthday_person["user_id"],
 		subject=_(f"Happy Birthday, {employee_name}🎂"),
-		message=message_res
+		message=message_res,
+		from_users=['Administrator']
 	)
 
 
@@ -261,7 +264,9 @@ def send_anniversary_wishes(anniversary_person, sender=None):
 		sender=sender,
 		recipients=anniversary_person["user_id"],
 		subject=_(f"Happy Work Anniversary, {employee_name}"),
-		message=message_res
+		message=message_res,
+		create_notification_log=True,
+		from_users=['Administrator']
 	)
 
 def get_work_anniversary_reminder_text(anniversary_persons: list) -> str:
@@ -307,6 +312,8 @@ def send_work_anniversary_reminder(
 			message=message,
 		),
 		header=_("Work Anniversary Reminder"),
+		create_notification_log=True,
+		from_users=[person['user_id'] for person in anniversary_persons]
 	)
 
 
