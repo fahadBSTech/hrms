@@ -7,8 +7,9 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
         # Construct the path to the credentials file
 cred_path = os.path.join(current_dir, "firebase.json")
 
-cred = credentials.Certificate(cred_path)
-firebase_admin.initialize_app(cred)
+if os.path.isfile(cred_path):
+    cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
 
 def send_push_notification(token, title=None, body=None, log=None):
     if log:
@@ -23,7 +24,7 @@ def send_push_notification(token, title=None, body=None, log=None):
     )
 
     # Send the message
-    response = messaging.send_multicast(message)
+    response = messaging.send_each_for_multicast(message)
     print("Push Notification sent Successfully")
 
 def get_message_text(log):

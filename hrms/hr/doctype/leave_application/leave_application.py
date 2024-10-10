@@ -674,6 +674,10 @@ class LeaveApplication(Document, PWANotificationsMixin):
 					sender=sender["email"],
 					subject=args.subject,
 					message=args.message,
+					reference_doctype=self.doctype,
+					reference_name=self.name,
+					create_notification_log=True,
+					from_users=[sender["email"] if frappe.session.user != "Administrator" else "Administrator"]
 				)
 				frappe.msgprint(_("Email sent to {0}").format(contact))
 			except frappe.OutgoingEmailError:

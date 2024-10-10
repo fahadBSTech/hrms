@@ -135,12 +135,11 @@ frappe.ui.form.on("Work From Home", {
 	},
     // Function to calculate total days
     calculate_total_days(frm) {
-        if (frm.doc.from_date && frm.doc.to_date && frm.doc.employee) {
+        if (frm.doc.from_date && frm.doc.to_date) {
             // Server call to calculate total WFH days including holidays and half days
             return frappe.call({
                 method: "hrms.hr.doctype.work_from_home.work_from_home.get_number_of_wfh_days",
                 args: {
-                    employee: frm.doc.employee,
                     from_date: frm.doc.from_date,
                     to_date: frm.doc.to_date,
                     half_day: frm.doc.half_day,
