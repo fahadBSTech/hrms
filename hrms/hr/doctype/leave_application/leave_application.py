@@ -86,6 +86,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
 
+
 	def on_update(self):
 		if self.status == "Open" and self.docstatus < 1:
 			# notify leave approver about creation
@@ -702,7 +703,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		):
 			return True
 		return False
-
+	
 	def create_separate_ledger_entries(self, alloc_on_from_date, alloc_on_to_date, submit, lwp):
 		"""Creates separate ledger entries for application period falling into separate allocations"""
 		# for creating separate ledger entries existing allocation periods should be consecutive
@@ -843,6 +844,8 @@ def get_number_of_leave_days(
 		number_of_days = flt(number_of_days) - flt(
 			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
 		)
+		if number_of_days == 0:
+			frappe.throw(_("The day(s) on which you are applying for leave are holidays."))
 	return number_of_days
 
 
