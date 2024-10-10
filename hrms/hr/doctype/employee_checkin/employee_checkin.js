@@ -16,6 +16,25 @@ frappe.ui.form.on("Employee Checkin", {
 		}
 	},
 
+	onload: function(frm) {
+        if (!frm.doc.employee) { // Check if the employee field is empty
+            frappe.call({
+                method: "frappe.client.get",
+                args: {
+                    doctype: "Employee",
+                    filters: {
+                        "user_id": frappe.session.user
+                    }
+                },
+                callback: function(r) {
+                    if (r.message) {
+                        frm.set_value('employee', r.message.name); // Set the employee field
+                    }
+                }
+            });
+        }
+    },
+	
 	add_fetch_shift_button(frm) {
 		if (frm.doc.attendace) return;
 		frm.add_custom_button(__("Fetch Shift"), function () {

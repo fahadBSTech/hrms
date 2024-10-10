@@ -6,14 +6,18 @@ import frappe
 from frappe.model.document import Document
 import datetime
 from frappe import _
-
+from frappe.utils import flt
+from erpnext.setup.doctype.employee.employee import get_holiday_list_for_employee
+from hrms.hr.doctype.leave_application.leave_application import get_holidays
 
 @frappe.whitelist()
 def get_number_of_wfh_days(
+		employee: str,
 		from_date: datetime.date,
 		to_date: datetime.date,
 		half_day: int | str | None = None,
-		half_day_date: datetime.date | str | None = None
+		half_day_date: datetime.date | str | None = None,
+		holiday_list: str | None = None,
 ) -> float:
 	from frappe.utils import cint, add_days, date_diff, getdate
 	"""Returns number of leave days between 2 dates after considering half day and holidays
@@ -28,6 +32,9 @@ def get_number_of_wfh_days(
 			number_of_days = date_diff(to_date, from_date) + 1
 	else:
 		number_of_days = date_diff(to_date, from_date) + 1
+	number_of_days = flt(number_of_days) - flt(
+			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+		)
 	return number_of_days
 
 

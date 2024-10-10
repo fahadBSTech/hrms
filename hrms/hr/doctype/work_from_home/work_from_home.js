@@ -67,8 +67,24 @@ frappe.ui.form.on("Work From Home", {
 			maxDate: frappe.datetime.str_to_obj(frm.doc.to_date),
 		});
 	},
-
-
+    onload: function(frm) {
+        if (!frm.doc.employee) { // Check if the employee field is empty
+            frappe.call({
+                method: "frappe.client.get",
+                args: {
+                    doctype: "Employee",
+                    filters: {
+                        "user_id": frappe.session.user
+                    }
+                },
+                callback: function(r) {
+                    if (r.message) {
+                        frm.set_value('employee', r.message.name); // Set the employee field
+                    }
+                }
+            });
+        }
+    },
     // Trigger to calculate total days when from_date changes
     from_date(frm) {
         frm.trigger('calculate_total_days');
@@ -119,15 +135,17 @@ frappe.ui.form.on("Work From Home", {
 	},
     // Function to calculate total days
     calculate_total_days(frm) {
-        if (frm.doc.from_date && frm.doc.to_date) {
+        if (frm.doc.from_date && frm.doc.to_date && frm.doc.employee) {
             // Server call to calculate total WFH days including holidays and half days
             return frappe.call({
                 method: "hrms.hr.doctype.work_from_home.work_from_home.get_number_of_wfh_days",
                 args: {
+                    employee: frm.doc.employee,
                     from_date: frm.doc.from_date,
                     to_date: frm.doc.to_date,
                     half_day: frm.doc.half_day,
                     half_day_date: frm.doc.half_day_date,
+                    holiday_list: frm.doc.holiday_list,
                 },
                 callback: function (r) {
                     if (r && r.message) {

@@ -719,7 +719,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		):
 			return True
 		return False
-
+	
 	def create_separate_ledger_entries(self, alloc_on_from_date, alloc_on_to_date, submit, lwp):
 		"""Creates separate ledger entries for application period falling into separate allocations"""
 		# for creating separate ledger entries existing allocation periods should be consecutive
