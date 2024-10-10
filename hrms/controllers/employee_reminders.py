@@ -86,16 +86,12 @@ def send_holidays_reminder_in_advance(employee, holidays):
 # ------------------
 def send_birthday_reminders():
 	"""Send Employee birthday reminders if no 'Stop Birthday Reminders' is not set."""
-	print("here")
 	to_send = int(frappe.db.get_single_value("HR Settings", "send_birthday_reminders"))
-	print(to_send)
 	if not to_send:
 		return
 
 	sender = get_sender_email()
 	employees_born_today = get_employees_who_are_born_today()
-	print(employees_born_today)
-
 	for company, birthday_persons in employees_born_today.items():
 		employee_emails = get_all_employee_emails(company)
 		birthday_person_emails = [get_employee_email(doc) for doc in birthday_persons]
