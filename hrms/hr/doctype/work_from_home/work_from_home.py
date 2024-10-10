@@ -12,6 +12,7 @@ from hrms.hr.doctype.leave_application.leave_application import get_holidays
 
 @frappe.whitelist()
 def get_number_of_wfh_days(
+		employee: str,
 		from_date: datetime.date,
 		to_date: datetime.date,
 		half_day: int | str | None = None,
@@ -34,6 +35,8 @@ def get_number_of_wfh_days(
 	number_of_days = flt(number_of_days) - flt(
 			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
 		)
+	if number_of_days == 0:
+			frappe.throw(_("The day(s) on which you are applying for work from home are holidays."))
 	return number_of_days
 
 
@@ -41,29 +44,10 @@ def get_number_of_wfh_days(
 class WorkFromHome(Document):
 
 	def validate(self):
-		self.validate_holiday()
 		self.validate_same_day_wfh()
 		self.validate_leave_on_same_day()
 		self.half_day_wfh_scenarios()
 
-	def validate_holiday(self):
-		if self.employee and self.from_date and self.to_date:
-			# Get the employee's holiday list
-			holiday_list = frappe.db.get_value("Employee", self.employee, "holiday_list")
-
-			if not holiday_list:
-				frappe.throw("No holiday list assigned to the employee.")
-
-			# Fetch holidays between the from_date and to_date
-			holidays = frappe.db.sql("""
-	            SELECT holiday_date FROM `tabHoliday`
-	            WHERE parent = %s AND holiday_date BETWEEN %s AND %s
-	        """, (holiday_list, self.from_date, self.to_date), as_dict=True)
-
-			if holidays:
-				holiday_dates = ", ".join([str(holiday.holiday_date) for holiday in holidays])
-				frappe.throw(
-					f"Work from home cannot be applied on holidays. These dates fall on holidays: {holiday_dates}")
 
 	def validate_same_day_wfh(self):
 		"""Validate if a WFH already exists for the same employee on the same date."""
