@@ -3,6 +3,7 @@
 
 import frappe
 from frappe import _
+from frappe.email.doctype.email_template.email_template import get_email_template
 from frappe.utils import add_days, add_months, comma_sep, getdate, today
 
 from erpnext.setup.doctype.employee.employee import get_all_employee_emails, get_employee_email
@@ -146,15 +147,13 @@ def send_birthday_reminder(recipients, reminder_text, birthday_persons, message,
 
 
 def send_birthday_wishes(birthday_person, sender=None):
-	employee_name = birthday_person["name"]
-	email_template = frappe.get_doc("Email Template", "Birthday Wish Template")
-	message_res = frappe.render_template(email_template.response, {"birthday_person": birthday_person})
+	email = get_email_template("Birthday Wish Template", {"birthday_person": birthday_person})
 	frappe.sendmail(
 		sender=sender,
 		recipients=birthday_person["user_id"],
-		subject=_(f"Happy Birthday, {employee_name}"),
-		header=_(f"Happy Birthday, {employee_name}🎂"),
-		message=message_res,
+		subject=email.get('subject'),
+		header=email.get('subject'),
+		message=email.get('message'),
 		create_notification_log=True,
 		from_users=['Administrator']
 	)
@@ -254,18 +253,15 @@ def send_work_anniversary_reminders():
 			send_anniversary_wishes(an_person, sender=sender)
 
 def send_anniversary_wishes(anniversary_person, sender=None):
-	employee_name = anniversary_person["name"]
 	number_of_years = getdate().year - anniversary_person["date_of_joining"].year
-	email_template = frappe.get_doc("Email Template", "Anniversary Wish Email")
-	message_res = frappe.render_template(email_template.response,
-										 {"anniversary_person": anniversary_person,
-										  "number_of_years": number_of_years})
+	email = get_email_template("Anniversary Wish Email", {"anniversary_person": anniversary_person,
+														  "number_of_years": number_of_years})
 	frappe.sendmail(
 		sender=sender,
 		recipients=anniversary_person["user_id"],
-		subject=_(f"Happy Work Anniversary, {employee_name}"),
-		header=_(f"Happy Work Anniversary, {employee_name}"),
-		message=message_res,
+		subject=email.get('subject'),
+		header=email.get('subject'),
+		message=email.get('message'),
 		create_notification_log=True,
 		from_users=['Administrator']
 	)
