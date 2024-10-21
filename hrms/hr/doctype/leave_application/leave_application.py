@@ -361,7 +361,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 				self.half_day_date,
 			)
 
-			if self.total_leave_days <= 0:
+			if self.from_date & self.to_date & (self.total_leave_days == 0):
 				frappe.throw(
 					_(
 						"The day(s) on which you are applying for leave are holidays. You need not apply for leave."
@@ -844,8 +844,6 @@ def get_number_of_leave_days(
 		number_of_days = flt(number_of_days) - flt(
 			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
 		)
-		if number_of_days == 0:
-			frappe.throw(_("The day(s) on which you are applying for leave are holidays."))
 	return number_of_days
 
 
