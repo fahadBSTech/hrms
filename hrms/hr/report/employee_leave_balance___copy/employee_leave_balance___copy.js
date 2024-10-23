@@ -3,7 +3,5 @@
 /* eslint-disable */
 
 frappe.query_reports["Employee Leave Balance - Copy"] = {
-	"filters": [
-
-	]
+	filters: [],
 };

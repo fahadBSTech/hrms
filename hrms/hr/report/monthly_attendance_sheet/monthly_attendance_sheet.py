@@ -468,13 +468,7 @@ def get_attendance_summary_and_days(employee: str, filters: Filters) -> tuple[di
 
 	summary = (
 		frappe.qb.from_(Attendance)
-		.select(
-			sum_present,
-			sum_absent,
-			sum_leave,
-			sum_half_day,
-			sum_work_from_home
-		)
+		.select(sum_present, sum_absent, sum_leave, sum_half_day, sum_work_from_home)
 		.where(
 			(Attendance.docstatus == 1)
 			& (Attendance.employee == employee)

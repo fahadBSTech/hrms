@@ -3,7 +3,5 @@
 /* eslint-disable */
 
 frappe.query_reports["Employee Work From Homes"] = {
-	"filters": [
-
-	]
+	filters: [],
 };
