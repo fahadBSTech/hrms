@@ -346,12 +346,12 @@ def  get_assigned_employees_with_specified_threshold(name, from_date=None,
 	inactive_employees = frappe.db.get_all("Employee", {"status": "inactive"},
 										   pluck="name")
 
-	if start_time:
+	if start_time is not None:
 		assigned_employees = [
 			emp for emp in assigned_employees
 			if (start_time-1 <= int(frappe.get_value("Employee", emp, "custom_notification_threshold_checkin") or 15) <= start_time+1) and not has_valid_log_for_today(in_log="IN", emp=emp)
 		]
-	elif end_time:
+	elif end_time is not None:
 		assigned_employees = [
 			emp for emp in assigned_employees
 			if (end_time-1 <= int(frappe.get_value("Employee", emp,
@@ -396,8 +396,8 @@ def notify_employees_to_checkin_or_checkout():
 																					  start_time=time_difference_in)
 		for emp in employees_closer_to_checkin:
 			employee = frappe.get_doc('Employee', emp)
-			if employee.custom_fcm_token:
-				notify_checkin.append(employee.custom_fcm_token)
+			if employee:
+				notify_checkin.append(employee.user_id)
 			frappe.enqueue(method="fcm_notification.send_notification.send_push_to_user", email=employee.user_id,
 						   title="Don’t Forget to Check In!",
 						   message="Good morning! Please remember to check in for your shift. Have a productive day!")
@@ -405,8 +405,8 @@ def notify_employees_to_checkin_or_checkout():
 																							 end_time=time_difference_out)
 		for emp in employees_closer_to_checkout:
 			employee = frappe.get_doc('Employee', emp)
-			if employee.custom_fcm_token:
-				notify_checkout.append(employee.custom_fcm_token)
+			if employee:
+				notify_checkout.append(employee.user_id)
 			frappe.enqueue(method="fcm_notification.send_notification.send_push_to_user", email=employee.user_id,
 						   title="Time to Check Out!",
 						   message="Your shift is almost over. Please remember to check out. Have a great evening!")
