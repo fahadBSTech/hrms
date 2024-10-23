@@ -112,7 +112,6 @@ def send_birthday_reminders():
 			send_birthday_wishes(bd_employee, sender=sender)
 
 
-
 def get_birthday_reminder_text_and_message(birthday_persons):
 	if len(birthday_persons) == 1:
 		birthday_person_text = birthday_persons[0]["name"]
@@ -142,7 +141,7 @@ def send_birthday_reminder(recipients, reminder_text, birthday_persons, message,
 		),
 		header=_("Birthday Reminder 🎂"),
 		create_notification_log=True,
-		from_users=['Administrator']
+		from_users=["Administrator"],
 	)
 
 
@@ -151,11 +150,11 @@ def send_birthday_wishes(birthday_person, sender=None):
 		sender=sender,
 		recipients=birthday_person["user_id"],
 		create_notification_log=True,
-		from_users=['Administrator'],
+		from_users=["Administrator"],
 		args=dict(
 			birthday_person=birthday_person,
 		),
-		email_template_name='Birthday Wish Template'
+		email_template_name="Birthday Wish Template",
 	)
 
 
@@ -252,19 +251,21 @@ def send_work_anniversary_reminders():
 		for an_person in anniversary_persons:
 			send_anniversary_wishes(an_person, sender=sender)
 
+
 def send_anniversary_wishes(anniversary_person, sender=None):
 	number_of_years = getdate().year - anniversary_person["date_of_joining"].year
 	frappe.sendmail(
 		sender=sender,
 		recipients=anniversary_person["user_id"],
 		create_notification_log=True,
-		from_users=['Administrator'],
+		from_users=["Administrator"],
 		args=dict(
 			number_of_years=number_of_years,
 			anniversary_person=anniversary_person,
 		),
-		email_template_name='Anniversary Wish Email'
+		email_template_name="Anniversary Wish Email",
 	)
+
 
 def get_work_anniversary_reminder_text(anniversary_persons: list) -> str:
 	if len(anniversary_persons) == 1:
@@ -310,7 +311,7 @@ def send_work_anniversary_reminder(
 		),
 		header=_("Work Anniversary Reminder"),
 		create_notification_log=True,
-		from_users=['Administrator']
+		from_users=["Administrator"],
 	)
 
 

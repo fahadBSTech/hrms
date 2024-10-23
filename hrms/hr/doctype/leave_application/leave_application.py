@@ -86,7 +86,6 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			self.validate_optional_leave()
 		self.validate_applicable_after()
 
-
 	def on_update(self):
 		if self.status == "Open" and self.docstatus < 1:
 			# notify leave approver about creation
@@ -432,7 +431,8 @@ class LeaveApplication(Document, PWANotificationsMixin):
 			as_dict=1,
 		):
 			if (
-				cint(self.half_day) == 1 and cint(d.half_day) == 1
+				cint(self.half_day) == 1
+				and cint(d.half_day) == 1
 				and getdate(self.half_day_date) == getdate(d.half_day_date)
 				and (
 					flt(self.total_leave_days) == 0.5
@@ -657,7 +657,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 					subject=args.subject,
 					message=args.message,
 					reference_doctype=self.doctype,
-					reference_name=self.name
+					reference_name=self.name,
 				)
 				frappe.msgprint(_("Email sent to {0}").format(contact))
 			except frappe.OutgoingEmailError:
@@ -703,7 +703,7 @@ class LeaveApplication(Document, PWANotificationsMixin):
 		):
 			return True
 		return False
-	
+
 	def create_separate_ledger_entries(self, alloc_on_from_date, alloc_on_to_date, submit, lwp):
 		"""Creates separate ledger entries for application period falling into separate allocations"""
 		# for creating separate ledger entries existing allocation periods should be consecutive
