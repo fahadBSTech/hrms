@@ -358,9 +358,8 @@ def has_valid_log_for_today(in_log=None, out_log=None, emp=None):
 	today = datetime.today()
 	log_type = in_log if in_log else out_log
 	valid_log = frappe.db.sql(
-		"""
-		SELECT log_type FROM `tabEmployee Checkin`
-		WHERE CAST(time as DATE)='%()' AND log_type='%(log_type)' AND employee = '%(emp)'
+		"""SELECT log_type FROM `tabEmployee Checkin`
+		WHERE CAST(time as DATE)=%(time_val)s AND log_type=%(log_type)s AND employee = %(emp)s
 		""",
 		{"time_val": today.strftime("%Y-%m-%d"), "log_type": log_type, "emp": emp},
 	)

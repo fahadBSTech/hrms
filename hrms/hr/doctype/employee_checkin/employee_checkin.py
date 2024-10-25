@@ -112,11 +112,8 @@ class EmployeeCheckin(Document):
 
 	def validate_current_day_checkin(self):
 		docs = frappe.db.sql(
-			"""
-			SELECT COUNT(log_type)
-			FROM `tabEmployee Checkin`
-			WHERE CAST(time as DATE)='%(time_val)' AND log_type='IN' AND employee = '%(employee)'
-			""",
+			"""SELECT COUNT(log_type) FROM `tabEmployee Checkin` WHERE CAST(time as DATE)=%(time_val)s AND
+			log_type='IN' AND employee = %(employee)s""",
 			{"time_val": self.time.split(" ")[0], "employee": self.employee},
 		)
 		if docs[0][0] < 1:
