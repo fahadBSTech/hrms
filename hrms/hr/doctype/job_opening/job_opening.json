@@ -11,6 +11,7 @@
   "job_details_section",
   "job_title",
   "designation",
+  "attachment",
   "column_break_5",
   "status",
   "posted_on",
@@ -250,12 +251,17 @@
    "fieldname": "publish_applications_received",
    "fieldtype": "Check",
    "label": "Publish Applications Received"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Attachment"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
  "links": [],
- "modified": "2024-04-01 11:32:47.167232",
+ "modified": "2024-11-05 12:41:27.981102",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
