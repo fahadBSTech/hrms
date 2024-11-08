@@ -183,7 +183,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-09-12 14:56:11.934580",
+ "modified": "2024-10-11 16:13:20.632229",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Recruitment",
@@ -246,6 +246,12 @@
    "label": "Job Offer",
    "link_to": "Job Offer",
    "stats_filter": "{\"status\":[\"=\",\"Accepted\"]}",
+   "type": "DocType"
+  },
+  {
+   "doc_view": "List",
+   "label": "Job Requisition",
+   "link_to": "Job Requisition",
    "type": "DocType"
   }
  ],

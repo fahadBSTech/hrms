@@ -24,7 +24,8 @@
   "tool_name",
   "expiration_date",
   "risk_owner",
-  "comment"
+  "comment",
+  "user"
  ],
  "fields": [
   {
@@ -127,7 +128,7 @@
    "fieldname": "risk_owner",
    "fieldtype": "Link",
    "label": "Risk Owner",
-   "options": "Employee"
+   "options": "User"
   },
   {
    "fieldname": "tool",
@@ -153,12 +154,21 @@
    "fieldname": "attachments",
    "fieldtype": "Attach",
    "label": "Attachments"
+  },
+  {
+   "fetch_from": "tool_project_assignment.user",
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "User",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-09 10:50:47.271636",
+ "modified": "2024-10-25 10:31:57.101951",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Access Assignment",

@@ -31,6 +31,7 @@
   "column_break_18",
   "posting_date",
   "status",
+  "reason_for_rejection",
   "sb_other_details",
   "salary_slip",
   "color",
@@ -252,6 +253,14 @@
    "fieldname": "sb_other_details",
    "fieldtype": "Section Break",
    "label": "Other Details"
+  },
+  {
+   "default": "\"\"",
+   "depends_on": "eval:doc.status == \"Rejected\"",
+   "fieldname": "reason_for_rejection",
+   "fieldtype": "Small Text",
+   "label": "Reason For Rejection",
+   "mandatory_depends_on": "eval:doc.status == \"Rejected\""
   }
  ],
  "icon": "fa fa-calendar",
@@ -259,7 +268,7 @@
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2024-08-20 10:27:01.178323",
+ "modified": "2024-10-17 14:49:42.940743",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",
@@ -356,5 +365,6 @@
  "sort_order": "DESC",
  "states": [],
  "timeline_field": "employee",
- "title_field": "employee_name"
+ "title_field": "employee_name",
+ "track_changes": 1
 }

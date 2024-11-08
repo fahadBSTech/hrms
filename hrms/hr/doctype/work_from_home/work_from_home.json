@@ -22,11 +22,12 @@
   "col_break_3",
   "team_lead_id",
   "lead_name",
+  "total_days",
   "col_break_2",
-  "status",
   "amended_from",
   "naming_series",
-  "total_days"
+  "status",
+  "reason_for_rejection"
  ],
  "fields": [
   {
@@ -153,12 +154,20 @@
    "fieldname": "half_day_date",
    "fieldtype": "Date",
    "label": "Half Day Date"
+  },
+  {
+   "default": "\"\"",
+   "depends_on": "eval:doc.status == \"Rejected\"",
+   "fieldname": "reason_for_rejection",
+   "fieldtype": "Small Text",
+   "label": "Reason For Rejection",
+   "mandatory_depends_on": "eval:doc.status == \"Rejected\""
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-23 18:27:21.575984",
+ "modified": "2024-10-17 14:52:38.725046",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Work From Home",
@@ -167,5 +176,6 @@
  "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
