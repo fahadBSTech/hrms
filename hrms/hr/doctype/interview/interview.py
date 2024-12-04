@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 
 
-import datetime
+from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
 from google.apps import meet_v2
 import frappe
@@ -36,7 +36,9 @@ class Interview(Document):
             )
         self.show_job_applicant_update_dialog()
 
-    def on_save(self):
+    def after_insert(self):
+        meeting_link = get_meeting_link()
+
         recipients = get_recipients(self.name)
         ics_file = self.create_ics_file(recipients)
         attachments = [{
@@ -47,15 +49,17 @@ class Interview(Document):
             recipients=recipients,
             create_notification_log=True,
             from_users=["Administrator"],
+            for_users=recipients.remove(self.job_applicant),
             args=dict(
                 name=self.applicant_name,
                 title=self.job_title,
                 location=self.location,
                 date=self.scheduled_on,
                 time=self.from_time,
-                attachments=attachments
+                meeting_link=meeting_link
             ),
             email_template_name="Interview Scheduling Template",
+            attachments=attachments
         )
 
 
@@ -156,31 +160,15 @@ class Interview(Document):
 
     def create_ics_file(self, recipients):
         event_date = datetime.strptime(self.scheduled_on, "%Y-%m-%d").date()
-        start_time_obj = datetime.strptime(self.from_date, "%H:%M:%S").time()
-        end_time_obj = datetime.strptime(self.to_date, "%H:%M:%S").time()
+        start_time_obj = datetime.strptime(self.from_time, "%H:%M:%S").time()
+        end_time_obj = datetime.strptime(self.to_time, "%H:%M:%S").time()
 
         start_time = datetime.combine(event_date, start_time_obj)
         end_time = datetime.combine(event_date, end_time_obj)
 
         # Define event details
         event_name = f"{self.applicant_name}-({self.job_title})-{self.location} Interview"
-        event_description = (
-            "Dear {self.applicant_name}l,\n\n"
-            f"As a result of your application for the {self.job_title} position, "
-            f"I would like to invite you for an Online interview scheduled for {start_time.strftime("%B %d, %Y, at %I:%M %p")}. "
-            "Please follow the below-mentioned guidelines for the online video interview.\n"
-            "- It is recommended to turn on the video.\n"
-            "- Sign in to the Google meet link through your PC.\n"
-            "- Test your Camera, speaker, and mic before the interview.\n"
-            "- Be seated in a proper noise-free place with little or no distractions or disturbance.\n"
-            "- Please make sure your internet is working smoothly.\n"
-            "- Please check your video background to avoid privacy issues.\n\n"
-            "If the date or time of the interview is inconvenient, please contact me by phone (051-8739512) "
-            "or email (mashal@bitsol.tech) to arrange another appointment.\n\n"
-            "Kind Regards,\n\nMashal Farman\nHR Executive\nBitsol Technologies\n"
-            "https://bitsol.tech/"
-        )
-
+        event_description = "dummy desc"
         timezone = "Asia/Karachi"
 
         # Create ICS content
@@ -207,7 +195,7 @@ class Interview(Document):
     UID:{uuid.uuid4()}@google.com
     X-GOOGLE-CONFERENCE:https://meet.google.com/txo-unkn-pes
     CREATED:{datetime.now().strftime('%Y%m%dT%H%M%SZ')}
-    DESCRIPTION:{event_description.replace('\n', '\\n')}
+    DESCRIPTION:{event_description}
     LAST-MODIFIED:{datetime.now().strftime('%Y%m%dT%H%M%SZ')}
     STATUS:CONFIRMED
     SUMMARY:{event_name}
@@ -323,15 +311,15 @@ def send_interview_reminder():
         return
 
     remind_before = cstr(frappe.db.get_single_value("HR Settings", "remind_before")) or "01:00:00"
-    remind_before = datetime.datetime.strptime(remind_before, "%H:%M:%S")
-    reminder_date_time = datetime.datetime.now() + datetime.timedelta(
+    remind_before = datetime.strptime(remind_before, "%H:%M:%S")
+    reminder_date_time = datetime.now() + timedelta(
         hours=remind_before.hour, minutes=remind_before.minute, seconds=remind_before.second
     )
 
     interviews = frappe.get_all(
         "Interview",
         filters={
-            "scheduled_on": ["between", (datetime.datetime.now(), reminder_date_time)],
+            "scheduled_on": ["between", (datetime.now(), reminder_date_time)],
             "status": "Pending",
             "reminded": 0,
             "docstatus": ["!=", 2],
@@ -539,7 +527,9 @@ def get_events(start, end, filters=None):
 
 def get_meeting_link():
     try:
-        creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        import json
+        server_key = frappe.db.get_single_value("google_service_account", "server_key")
+        creds = Credentials.from_service_account_file(json.loads(server_key), scopes=SCOPES)
         impersonated_creds = creds.with_subject('hamza.khalil@bitsol.tech')
     except Exception as e:
         print(f"Error during authorization: {e}")
