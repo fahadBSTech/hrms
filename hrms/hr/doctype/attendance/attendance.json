@@ -20,6 +20,7 @@
   "company",
   "department",
   "attendance_request",
+  "expected_working_hours",
   "details_section",
   "shift",
   "in_time",
@@ -201,13 +202,20 @@
   {
    "fieldname": "column_break_18",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "8",
+   "fieldname": "expected_working_hours",
+   "fieldtype": "Float",
+   "label": "Expected Working Hours",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-04-05 20:55:02.905452",
+ "modified": "2024-12-04 12:40:33.687575",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",

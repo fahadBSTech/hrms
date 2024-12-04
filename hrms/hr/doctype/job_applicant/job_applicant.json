@@ -19,6 +19,7 @@
   "job_title",
   "designation",
   "status",
+  "screening_status",
   "source_and_rating_section",
   "source",
   "source_name",
@@ -140,14 +141,14 @@
   {
    "fieldname": "lower_range",
    "fieldtype": "Currency",
-   "label": "Lower Range",
+   "label": "Current Salary",
    "options": "currency",
    "precision": "0"
   },
   {
    "fieldname": "upper_range",
    "fieldtype": "Currency",
-   "label": "Upper Range",
+   "label": "Expected Salary",
    "options": "currency",
    "precision": "0"
   },
@@ -188,13 +189,19 @@
    "fieldtype": "Link",
    "label": "Designation",
    "options": "Designation"
+  },
+  {
+   "fieldname": "screening_status",
+   "fieldtype": "Select",
+   "label": "Screening Status",
+   "options": "Approved By HR\nApproved By Team Lead\nRejected By HR\nRejected By Team Lead"
   }
  ],
  "icon": "fa fa-user",
  "idx": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-14 17:03:48.838409",
+ "modified": "2024-11-25 10:12:27.460784",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",

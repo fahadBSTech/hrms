@@ -45,6 +45,7 @@ def get_current_month_working_days(company, start_date, end_date):
 			"employee": employee,
 			"status": ["in", ["On Leave", "Half Day"]],
 			"attendance_date": ["between", [start_date, end_date]],
+            "docstatus": 1
 		},
 		fields=["name", "employee", "status", "attendance_date"],
 	)
@@ -145,3 +146,38 @@ def get_leave_summary(start_date, end_date):
 		"availed_leaves": availed_leaves,
 		"remaining_leaves": remaining_leaves,
 	}
+
+
+
+
+
+@frappe.whitelist()
+def calculate_expected_hours(start_date=None, end_date=None):
+    # Get the current user
+    current_user = frappe.session.user
+
+    # Fetch the Employee record associated with the user
+    employee = frappe.db.get_value("Employee", {"user_id": current_user}, "name")
+    if not employee:
+        return {"error": "No employee record found for the current user."}
+
+    # Default to the current year's date range if not provided
+    if not start_date or not end_date:
+        current_year = datetime.now().year
+        start_date = f"{current_year}-01-01"
+        end_date = f"{current_year}-12-31"
+
+    # Fetch the sum of expected_working_hours for the current user in the given date range
+    total_hours = frappe.db.sql("""
+        SELECT SUM(expected_working_hours) AS total_hours
+        FROM `tabAttendance`
+        WHERE attendance_date BETWEEN %s AND %s
+          AND employee = %s
+    """, (start_date, end_date, employee), as_dict=True)[0].total_hours or 0
+
+    return {
+        "employee": employee,
+        "start_date": start_date,
+        "end_date": end_date,
+        "total_expected_working_hours": total_hours
+    }
