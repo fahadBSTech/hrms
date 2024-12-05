@@ -23,6 +23,7 @@ from hrms.hr.utils import (
 	validate_active_employee,
 )
 
+WORKING_HOURS = 8
 
 class DuplicateAttendanceError(frappe.ValidationError):
 	pass
@@ -43,6 +44,21 @@ class Attendance(Document):
 		self.validate_overlapping_shift_attendance()
 		self.validate_employee_status()
 		self.check_leave_record()
+		self.set_expected_working_hours()
+
+	def set_expected_working_hours(self):
+		"""
+		Sets the expected_working_hours field in the Attendance document
+		based on the status field before saving.
+		"""
+		if self.status in ["Present", "Absent"]:
+			self.expected_working_hours = WORKING_HOURS  # Default for Present
+		elif self.status == "Half Day":
+			self.expected_working_hours = WORKING_HOURS / 2  # Default for Half Day
+		elif self.status == "On Leave":
+			self.expected_working_hours = 0  # Default for Leave or Absent
+		else:
+			self.expected_working_hours = None
 
 	def on_cancel(self):
 		self.unlink_attendance_from_checkins()
