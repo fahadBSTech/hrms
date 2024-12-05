@@ -324,6 +324,7 @@ has_permission = {"Training Event": "hrms.permissions.has_te_permission_query"}
 #
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
 
+ignore_links_on_delete = ["PWA Notification"]
 
 # User Data Protection
 # --------------------
