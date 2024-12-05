@@ -11,6 +11,7 @@
   "tool_description",
   "column_break_yhdx",
   "category",
+  "url",
   "default_expiry_period"
  ],
  "fields": [
@@ -47,11 +48,16 @@
    "fieldname": "default_expiry_period",
    "fieldtype": "Int",
    "label": "Default Expiry Period (In Days)"
+  },
+  {
+   "fieldname": "url",
+   "fieldtype": "Data",
+   "label": "URL"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-09 10:53:56.213087",
+ "modified": "2024-11-14 16:01:37.483652",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Access Tools",
