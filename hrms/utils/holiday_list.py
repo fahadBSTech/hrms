@@ -168,7 +168,7 @@ def calculate_expected_hours(start_date=None, end_date=None):
 	total_hours = frappe.db.sql("""
 		SELECT SUM(expected_working_hours) AS total_hours
 		FROM `tabAttendance`
-		WHERE attendance_date BETWEEN %s AND %s
+		WHERE docstatus = 1 AND attendance_date BETWEEN %s AND %s
 		AND employee = %s
 	""", (start_date, end_date, employee), as_dict=True)[0].total_hours or 0
 
