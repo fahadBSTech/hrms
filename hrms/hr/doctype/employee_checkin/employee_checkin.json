@@ -171,7 +171,7 @@
   }
  ],
  "links": [],
- "modified": "2024-08-21 12:21:29.558909",
+ "modified": "2024-12-06 15:30:36.057229",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
@@ -267,7 +267,7 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "ASC",
+ "sort_order": "DESC",
  "states": [],
  "title_field": "employee_name",
  "track_changes": 1
