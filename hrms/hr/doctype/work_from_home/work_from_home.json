@@ -11,6 +11,7 @@
   "section_whf_1",
   "employee",
   "employee_name",
+  "employee_user",
   "col_break_1",
   "from_date",
   "to_date",
@@ -162,12 +163,18 @@
    "fieldtype": "Small Text",
    "label": "Reason For Rejection",
    "mandatory_depends_on": "eval:doc.status == \"Rejected\""
+  },
+  {
+   "fetch_from": "employee.user_id",
+   "fieldname": "employee_user",
+   "fieldtype": "Data",
+   "label": "Employee User"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-17 14:52:38.725046",
+ "modified": "2025-01-22 16:02:51.257868",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Work From Home",
