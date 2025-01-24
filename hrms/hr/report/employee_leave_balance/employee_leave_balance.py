@@ -150,6 +150,9 @@ def get_employees(filters: Filters) -> list[dict]:
 	if filters.get("employee"):
 		query = query.where(Employee.name == filters.get("employee"))
 
+	if filters.get("user_id"):
+		query = query.where(Employee.user_id == filters.get("user_id"))
+
 	if filters.get("employee_status"):
 		query = query.where(Employee.status == filters.get("employee_status"))
 
