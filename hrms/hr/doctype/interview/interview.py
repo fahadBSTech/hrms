@@ -2,13 +2,21 @@
 # For license information, please see license.txt
 
 
-import datetime
-
+from datetime import datetime, timedelta
+from google.oauth2.service_account import Credentials
+from google.apps import meet_v2
 import frappe
+import uuid
 from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder.functions import Avg
 from frappe.utils import cint, cstr, get_datetime, get_link_to_form, getdate, nowtime
+
+SERVICE_ACCOUNT_FILE = 'erp-bitsol-meet.json'
+SCOPES = [
+	'https://www.googleapis.com/auth/meetings.space.created',
+	'https://www.googleapis.com/auth/meetings.space.readonly'
+]
 
 
 class DuplicateInterviewRoundError(frappe.ValidationError):
@@ -27,6 +35,34 @@ class Interview(Document):
 				title=_("Not Allowed"),
 			)
 		self.show_job_applicant_update_dialog()
+
+	def after_insert(self):
+		meeting_link = get_meeting_link()
+
+		recipients = get_recipients(self.name)
+		ics_file = self.create_ics_file(recipients)
+		attachments = [{
+			"fname": "event.ics",
+			"fcontent": ics_file
+		}]
+		frappe.sendmail(
+			recipients=recipients,
+			create_notification_log=True,
+			from_users=["Administrator"],
+			for_users=recipients.remove(self.job_applicant),
+			args=dict(
+				name=self.applicant_name,
+				title=self.job_title,
+				location=self.location,
+				date=self.scheduled_on,
+				time=self.from_time,
+				meeting_link=meeting_link
+			),
+			email_template_name="Interview Scheduling Template",
+			attachments=attachments
+		)
+
+
 
 	def validate_duplicate_interview(self):
 		duplicate_interview = frappe.db.exists(
@@ -76,6 +112,7 @@ class Interview(Document):
 			},
 		)
 
+
 	def get_job_applicant_status(self) -> str | None:
 		status_map = {"Cleared": "Accepted", "Rejected": "Rejected"}
 		return status_map.get(self.status, None)
@@ -121,6 +158,55 @@ class Interview(Document):
 
 		frappe.msgprint(_("Interview Rescheduled successfully"), indicator="green")
 
+	def create_ics_file(self, recipients):
+		event_date = datetime.strptime(self.scheduled_on, "%Y-%m-%d").date()
+		start_time_obj = datetime.strptime(self.from_time, "%H:%M:%S").time()
+		end_time_obj = datetime.strptime(self.to_time, "%H:%M:%S").time()
+
+		start_time = datetime.combine(event_date, start_time_obj)
+		end_time = datetime.combine(event_date, end_time_obj)
+
+		# Define event details
+		event_name = f"{self.applicant_name}-({self.job_title})-{self.location} Interview"
+		event_description = "dummy desc"
+		timezone = "Asia/Karachi"
+
+		# Create ICS content
+		ics_content = f"""BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VTIMEZONE
+    TZID:{timezone}
+    X-LIC-LOCATION:{timezone}
+    BEGIN:STANDARD
+    TZOFFSETFROM:+0500
+    TZOFFSETTO:+0500
+    TZNAME:PKT
+    DTSTART:19700101T000000
+    END:STANDARD
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;TZID={timezone}:{start_time.strftime('%Y%m%dT%H%M%S')}
+    DTEND;TZID={timezone}:{end_time.strftime('%Y%m%dT%H%M%S')}
+    DTSTAMP:{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}
+    ORGANIZER;CN=Mashal Farman:mailto:mashal@bitsol.tech
+    UID:{uuid.uuid4()}@google.com
+    X-GOOGLE-CONFERENCE:https://meet.google.com/txo-unkn-pes
+    CREATED:{datetime.now().strftime('%Y%m%dT%H%M%SZ')}
+    DESCRIPTION:{event_description}
+    LAST-MODIFIED:{datetime.now().strftime('%Y%m%dT%H%M%SZ')}
+    STATUS:CONFIRMED
+    SUMMARY:{event_name}
+    TRANSP:OPAQUE
+"""
+
+		for attenndee in recipients:
+			ics_content += f"ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={attenndee};X-NUM-GUESTS=0:mailto:{attenndee}"
+
+		ics_content += "END:VEVENT\nEND:VCALENDAR"
+		return ics_content
 
 @frappe.whitelist()
 def get_interviewers(interview_round: str) -> list[str]:
@@ -225,15 +311,15 @@ def send_interview_reminder():
 		return
 
 	remind_before = cstr(frappe.db.get_single_value("HR Settings", "remind_before")) or "01:00:00"
-	remind_before = datetime.datetime.strptime(remind_before, "%H:%M:%S")
-	reminder_date_time = datetime.datetime.now() + datetime.timedelta(
+	remind_before = datetime.strptime(remind_before, "%H:%M:%S")
+	reminder_date_time = datetime.now() + timedelta(
 		hours=remind_before.hour, minutes=remind_before.minute, seconds=remind_before.second
 	)
 
 	interviews = frappe.get_all(
 		"Interview",
 		filters={
-			"scheduled_on": ["between", (datetime.datetime.now(), reminder_date_time)],
+			"scheduled_on": ["between", (datetime.now(), reminder_date_time)],
 			"status": "Pending",
 			"reminded": 0,
 			"docstatus": ["!=", 2],
@@ -394,17 +480,17 @@ def get_events(start, end, filters=None):
 	# nosemgrep: frappe-semgrep-rules.rules.frappe-using-db-sql
 	interviews = frappe.db.sql(
 		f"""
-			SELECT DISTINCT
-				`tabInterview`.name, `tabInterview`.job_applicant, `tabInterview`.interview_round,
-				`tabInterview`.scheduled_on, `tabInterview`.status, `tabInterview`.from_time as from_time,
-				`tabInterview`.to_time as to_time
-			from
-				`tabInterview`
-			where
-				(`tabInterview`.scheduled_on between %(start)s and %(end)s)
-				and docstatus != 2
-				{conditions}
-			""",
+            SELECT DISTINCT
+                `tabInterview`.name, `tabInterview`.job_applicant, `tabInterview`.interview_round,
+                `tabInterview`.scheduled_on, `tabInterview`.status, `tabInterview`.from_time as from_time,
+                `tabInterview`.to_time as to_time
+            from
+                `tabInterview`
+            where
+                (`tabInterview`.scheduled_on between %(start)s and %(end)s)
+                and docstatus != 2
+                {conditions}
+            """,
 		{"start": start, "end": end},
 		as_dict=True,
 		update={"allDay": 0},
@@ -437,3 +523,26 @@ def get_events(start, end, filters=None):
 		events.append(interview_data)
 
 	return events
+
+
+def get_meeting_link():
+	try:
+		import json
+		server_key = frappe.db.get_single_value("google_service_account", "server_key")
+		creds = Credentials.from_service_account_file(json.loads(server_key), scopes=SCOPES)
+		impersonated_creds = creds.with_subject('hamza.khalil@bitsol.tech')
+	except Exception as e:
+		print(f"Error during authorization: {e}")
+		return None
+
+	try:
+		client = meet_v2.SpacesServiceClient(credentials=impersonated_creds)
+		request = meet_v2.CreateSpaceRequest()
+		response = client.create_space(request=request)
+		print(f'Space created: {response.meeting_uri}')
+		return response.meeting_uri
+	except Exception as e:
+		print(f"Error creating space: {e}")
+		return None
+
+

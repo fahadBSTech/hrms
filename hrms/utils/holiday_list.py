@@ -115,10 +115,10 @@ def get_leave_summary(start_date, end_date):
 	total_allocated_leaves = (
 			frappe.db.sql(
 				"""
-			SELECT SUM(total_leaves_allocated)
-			FROM `tabLeave Allocation`
-			WHERE employee = %s AND from_date >= %s AND to_date <= %s AND docstatus = 1
-		""",
+		SELECT SUM(total_leaves_allocated)
+		FROM `tabLeave Allocation`
+		WHERE employee = %s AND from_date >= %s AND to_date <= %s AND docstatus = 1
+	""",
 				(employee, start_date, end_date),
 			)[0][0]
 			or 0
@@ -128,10 +128,10 @@ def get_leave_summary(start_date, end_date):
 	availed_leaves = (
 			frappe.db.sql(
 				"""
-			SELECT SUM(total_leave_days)
-			FROM `tabLeave Application`
-			WHERE employee = %s AND status = 'Approved' AND from_date >= %s AND to_date <= %s AND docstatus = 1
-		""",
+		SELECT SUM(total_leave_days)
+		FROM `tabLeave Application`
+		WHERE employee = %s AND status = 'Approved' AND from_date >= %s AND to_date <= %s AND docstatus = 1
+	""",
 				(employee, start_date, end_date),
 			)[0][0]
 			or 0
