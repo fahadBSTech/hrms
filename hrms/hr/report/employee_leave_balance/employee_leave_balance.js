@@ -8,14 +8,14 @@ frappe.query_reports["Employee Leave Balance"] = {
 			label: __("From Date"),
 			fieldtype: "Date",
 			reqd: 1,
-			default: frappe.defaults.get_global_default("year_start_date"),
+			
 		},
 		{
 			fieldname: "to_date",
 			label: __("To Date"),
 			fieldtype: "Date",
 			reqd: 1,
-			default: frappe.defaults.get_global_default("year_end_date"),
+			
 		},
 		{
 			label: __("Company"),
@@ -36,6 +36,7 @@ frappe.query_reports["Employee Leave Balance"] = {
 			label: __("Employee"),
 			fieldtype: "Link",
 			options: "Employee",
+			default: "",
 		},
 		{
 			fieldname: "employee_status",
@@ -68,11 +69,13 @@ frappe.query_reports["Employee Leave Balance"] = {
 				from_date: today,
 				to_date: today,
 				company: frappe.defaults.get_user_default("Company"),
+				employee: frappe.session.user,
 			},
 			freeze: true,
 			callback: (data) => {
 				frappe.query_report.set_filter_value("from_date", data.message[0].from_date);
 				frappe.query_report.set_filter_value("to_date", data.message[0].to_date);
+				
 			},
 		});
 	},
