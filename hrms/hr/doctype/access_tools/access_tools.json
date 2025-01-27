@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "AT-.YY.-.MM.-.#####",
  "creation": "2024-10-08 11:30:48.643694",
@@ -57,7 +58,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-14 16:01:37.483652",
+ "modified": "2024-12-13 16:48:58.325671",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Access Tools",

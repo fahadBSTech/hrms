@@ -213,17 +213,18 @@
   },
   {
    "fetch_from": "employee.user_id",
-   "fetch_if_empty": 1,
    "fieldname": "custom_employee_user",
-   "fieldtype": "Data",
-   "label": "Employee User"
+   "fieldtype": "Link",
+   "label": "User Email",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-25 15:26:02.661816",
+ "modified": "2025-01-25 21:41:30.417505",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",

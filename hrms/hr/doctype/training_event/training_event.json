@@ -197,8 +197,9 @@
    "options": "Email"
   }
  ],
+ "is_submittable": 1,
  "links": [],
- "modified": "2024-10-17 11:44:13.845433",
+ "modified": "2025-01-20 15:21:31.978981",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Training Event",

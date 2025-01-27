@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "format:RE-{MM}-{YYY}-{employee}-{employee_name}-{#####}",
  "creation": "2023-08-10 16:34:36.173064",
@@ -14,7 +15,9 @@
   "reimbursement_type",
   "total_amount",
   "amended_from",
-  "custom_employee_user"
+  "custom_employee_user",
+  "reimbursement_date",
+  "expense_department"
  ],
  "fields": [
   {
@@ -63,18 +66,32 @@
    "reqd": 1
   },
   {
+   "fieldname": "reimbursement_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "expense_department",
+   "fieldtype": "Link",
+   "label": "Expense Department",
+   "options": "Expense Department",
+   "permlevel": 1
+  },
+  {
    "fetch_from": "employee.user_id",
    "fetch_if_empty": 1,
    "fieldname": "custom_employee_user",
-   "fieldtype": "Data",
-   "label": "Employee User"
+   "fieldtype": "Link",
+   "label": "User Email",
+   "options": "User"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
  "max_attachments": 10,
- "modified": "2025-01-25 15:32:09.162546",
+ "modified": "2025-01-25 21:44:24.423720",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Reimbursement",

@@ -110,9 +110,19 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Training Events",
+   "link_count": 0,
+   "link_to": "Training Event",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-09-12 14:56:09.869960",
+ "modified": "2025-01-22 11:38:04.188165",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "My Dashboard",

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "ACAS-.YY.-.MM.-.#####",
  "creation": "2024-10-08 11:42:58.021989",
@@ -72,6 +73,7 @@
   {
    "fieldname": "assigned_by",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Assigned By",
    "options": "User",
    "read_only": 1
@@ -101,6 +103,7 @@
    "fetch_from": "tool_project_assignment.employee",
    "fieldname": "employee",
    "fieldtype": "Data",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Employee",
    "reqd": 1
@@ -160,6 +163,7 @@
    "fieldname": "user",
    "fieldtype": "Link",
    "hidden": 1,
+   "ignore_user_permissions": 1,
    "label": "User",
    "options": "User",
    "read_only": 1
@@ -168,7 +172,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-25 10:31:57.101951",
+ "modified": "2024-12-13 16:48:04.333561",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Access Assignment",
