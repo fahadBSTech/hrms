@@ -12,7 +12,6 @@ from frappe.model.document import Document
 from frappe.query_builder.functions import Avg
 from frappe.utils import cint, cstr, get_datetime, get_link_to_form, getdate, nowtime
 
-SERVICE_ACCOUNT_FILE = 'erp-bitsol-meet.json'
 SCOPES = [
 	'https://www.googleapis.com/auth/meetings.space.created',
 	'https://www.googleapis.com/auth/meetings.space.readonly'
@@ -528,9 +527,9 @@ def get_events(start, end, filters=None):
 def get_meeting_link():
 	try:
 		import json
-		server_key = frappe.db.get_single_value("google_service_account", "server_key")
+		server_key = frappe.db.get_single_value("FCM Notification Settings", "google_service_account")
 		creds = Credentials.from_service_account_file(json.loads(server_key), scopes=SCOPES)
-		impersonated_creds = creds.with_subject('hamza.khalil@bitsol.tech')
+		impersonated_creds = creds.with_subject('hr@bitsol.tech')
 	except Exception as e:
 		print(f"Error during authorization: {e}")
 		return None
