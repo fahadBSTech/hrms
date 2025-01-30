@@ -20,7 +20,8 @@
   "project_team_lead",
   "status",
   "allocated_hours_monthly",
-  "user"
+  "user",
+  "team_lead_user"
  ],
  "fields": [
   {
@@ -122,6 +123,14 @@
    "hidden": 1,
    "label": "User",
    "options": "User"
+  },
+  {
+   "fetch_from": "project_team_lead.user_id",
+   "fieldname": "team_lead_user",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Team Lead User",
+   "options": "User"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -132,7 +141,7 @@
    "link_fieldname": "tool_project_assignment"
   }
  ],
- "modified": "2024-12-13 16:38:44.878953",
+ "modified": "2025-01-28 15:41:17.966116",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Project Assignment",
