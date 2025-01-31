@@ -47,7 +47,7 @@
    "fieldname": "employee_role",
    "fieldtype": "Select",
    "label": "Employee Role",
-   "options": "Backend Developer\nFrontend Developer\nQuality Assurance Engineer\nProject Manager\nTeam Lead\nHR Manager"
+   "options": "Backend Developer\nFrontend Developer\nQuality Assurance Engineer\nProject Manager\nTeam Lead\nHR\nGraphics Designer\nProject Coordinator\nFull Stack Developer\nDevOps Engineer\nOperations"
   },
   {
    "fieldname": "start_date",
@@ -98,6 +98,7 @@
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Employee Name"
   },
@@ -113,6 +114,7 @@
   {
    "fieldname": "project_team_lead",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Team Lead",
    "options": "Employee"
   },
@@ -131,6 +133,8 @@
    "hidden": 1,
    "label": "Team Lead User",
    "options": "User"
+   "ignore_user_permissions": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
