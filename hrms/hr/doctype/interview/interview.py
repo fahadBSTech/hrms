@@ -529,15 +529,15 @@ def get_meeting_link():
 		creds = Credentials.from_service_account_file(json.loads(server_key), scopes=SCOPES)
 		impersonated_creds = creds.with_subject("hr@bitsol.tech")
 	except Exception as e:
-		print(f"Error during authorization: {e}")
+		frappe.msgprint(f"Error during authorization: {e}")
 		return None
 
 	try:
 		client = meet_v2.SpacesServiceClient(credentials=impersonated_creds)
 		request = meet_v2.CreateSpaceRequest()
 		response = client.create_space(request=request)
-		print(f"Space created: {response.meeting_uri}")
+		frappe.msgprint(f"Space created: {response.meeting_uri}")
 		return response.meeting_uri
 	except Exception as e:
-		print(f"Error creating space: {e}")
+		frappe.msgprint(f"Error creating space: {e}")
 		return None
