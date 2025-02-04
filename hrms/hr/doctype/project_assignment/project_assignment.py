@@ -35,7 +35,7 @@ class ProjectAssignment(Document):
 					"start_date": ("<=", self.end_date),
 					"end_date": (">=", self.start_date),
 					"name": ("!=", self.name),
-					"docstatus": 1
+					"docstatus": 1,
 				},
 			):
 				frappe.throw(_("Employee is already assigned to a project in this period"))
@@ -49,7 +49,7 @@ class ProjectAssignment(Document):
 				"start_date": ("<=", self.end_date),
 				"end_date": (">=", self.start_date),
 				"name": ("!=", self.name),
-				"docstatus": 1
+				"docstatus": 1,
 			},
 			fields=["allocated_hours_daily", "allocated_hours_monthly"],
 		)

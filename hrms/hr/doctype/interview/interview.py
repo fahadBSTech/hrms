@@ -2,19 +2,20 @@
 # For license information, please see license.txt
 
 
+import uuid
 from datetime import datetime, timedelta
+
 from google.oauth2.service_account import Credentials
 from google.apps import meet_v2
 import frappe
-import uuid
 from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder.functions import Avg
 from frappe.utils import cint, cstr, get_datetime, get_link_to_form, getdate, nowtime
 
 SCOPES = [
-	'https://www.googleapis.com/auth/meetings.space.created',
-	'https://www.googleapis.com/auth/meetings.space.readonly'
+	"https://www.googleapis.com/auth/meetings.space.created",
+	"https://www.googleapis.com/auth/meetings.space.readonly",
 ]
 
 
@@ -40,10 +41,7 @@ class Interview(Document):
 
 		recipients = get_recipients(self.name)
 		ics_file = self.create_ics_file(recipients)
-		attachments = [{
-			"fname": "event.ics",
-			"fcontent": ics_file
-		}]
+		attachments = [{"fname": "event.ics", "fcontent": ics_file}]
 		frappe.sendmail(
 			recipients=recipients,
 			create_notification_log=True,
@@ -55,13 +53,11 @@ class Interview(Document):
 				location=self.location,
 				date=self.scheduled_on,
 				time=self.from_time,
-				meeting_link=meeting_link
+				meeting_link=meeting_link,
 			),
 			email_template_name="Interview Scheduling Template",
-			attachments=attachments
+			attachments=attachments,
 		)
-
-
 
 	def validate_duplicate_interview(self):
 		duplicate_interview = frappe.db.exists(
@@ -110,7 +106,6 @@ class Interview(Document):
 				"args": {"job_applicant": self.job_applicant, "status": job_applicant_status},
 			},
 		)
-
 
 	def get_job_applicant_status(self) -> str | None:
 		status_map = {"Cleared": "Accepted", "Rejected": "Rejected"}
@@ -206,6 +201,7 @@ class Interview(Document):
 
 		ics_content += "END:VEVENT\nEND:VCALENDAR"
 		return ics_content
+
 
 @frappe.whitelist()
 def get_interviewers(interview_round: str) -> list[str]:
@@ -538,10 +534,8 @@ def get_meeting_link():
 		client = meet_v2.SpacesServiceClient(credentials=impersonated_creds)
 		request = meet_v2.CreateSpaceRequest()
 		response = client.create_space(request=request)
-		print(f'Space created: {response.meeting_uri}')
+		print(f"Space created: {response.meeting_uri}")
 		return response.meeting_uri
 	except Exception as e:
 		print(f"Error creating space: {e}")
 		return None
-
-
