@@ -5,8 +5,9 @@
 import uuid
 from datetime import datetime, timedelta
 
-from google.oauth2.service_account import Credentials
 from google.apps import meet_v2
+from google.oauth2.service_account import Credentials
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -523,9 +524,10 @@ def get_events(start, end, filters=None):
 def get_meeting_link():
 	try:
 		import json
+
 		server_key = frappe.db.get_single_value("FCM Notification Settings", "google_service_account")
 		creds = Credentials.from_service_account_file(json.loads(server_key), scopes=SCOPES)
-		impersonated_creds = creds.with_subject('hr@bitsol.tech')
+		impersonated_creds = creds.with_subject("hr@bitsol.tech")
 	except Exception as e:
 		print(f"Error during authorization: {e}")
 		return None

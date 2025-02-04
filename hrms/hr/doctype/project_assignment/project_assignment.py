@@ -57,4 +57,6 @@ class ProjectAssignment(Document):
 		for project in projects:
 			total_hours += project.allocated_hours_daily
 		if total_hours > 8:
-			frappe.msgprint(_("Overbooked - Working hours cannot exceed 8 hours per day"), indicator="orange", alert=True)
+			frappe.msgprint(
+				_("Overbooked - Working hours cannot exceed 8 hours per day"), indicator="orange", alert=True
+			)
